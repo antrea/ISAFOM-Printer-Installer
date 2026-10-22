@@ -1,0 +1,57 @@
+{
+  "Release": "0.2.7-rc1",
+  "Completed": true,
+  "Accepted": false,
+  "RecordedAt": "2026-10-22T14:35:40.970123+02:00",
+  "InstallerSha256": "B139E8709863225961807A49024F5F54DE262C363A2ECDCF647227219325B7C1",
+  "PublishedExecutableUsed": true,
+  "ValidationScope": "Build, regression, simulated forced dependencies, real read-only preview and published EXE smoke",
+  "Checks": {
+    "Build": true,
+    "OrdinaryRemovalRegression": true,
+    "ForcedDependencyClosureSimulated": true,
+    "AllReviewedPortsSimulated": true,
+    "AbsentDriverConfirmationLogic": true,
+    "RealForcedPreviewReadOnly": true,
+    "GuiDpi": true,
+    "NativeIcon": true,
+    "PrintersDefaultAndPortsPreserved": true,
+    "All": true
+  },
+  "AutomatedChecks": {
+    "Core": 84,
+    "WindowsUiPrivacy": 17,
+    "Installer": 56,
+    "GuiDpi": 122,
+    "NormalRemovalSimulations": 31,
+    "ForcedRemovalSimulations": 16,
+    "PublishedExecutableSmoke": 16,
+    "QueueIdentityAndPlatform": 17,
+    "CatalogueTrust": 4
+  },
+  "PrinterMutationsThisRevision": false,
+  "PhysicalPrintPerformed": false,
+  "RealSharedDriverForceRemovalPerformed": false,
+  "DefaultDriver": "8.5.2405.0",
+  "OptionalDebugDriver": "8.7.917.0",
+  "RealPreview": {
+    "DriverVersion": "8.5.2405.0",
+    "OrdinaryRegistrations": 1,
+    "ForcedRegistrations": 1,
+    "ForcedQueues": 1,
+    "ForcedPorts": 1,
+    "ForceCanProceed": true
+  },
+  "PreviousNativeValidation": {
+    "Release": "0.2.6-rc1",
+    "InstallerSha256": "BB34BFF969D346EEE7FC1C4C451429471055D37D8B63B6B07087A67AEB29A863",
+    "Scope": "Native field application/readback and ordinary full removal of 8.5 and 8.7; a different published executable"
+  },
+  "PendingRealValidation": [
+    "Rimozione forzata reale di un gruppo con driver condivisi su un PC che presenta tale configurazione",
+    "Stampa e rilascio fisico tramite PIN",
+    "Nome sul pannello e attribuzione contabile sul dispositivo",
+    "Riavvio, nuova sessione e altro utente standard",
+    "PC Windows 10"
+  ]
+}

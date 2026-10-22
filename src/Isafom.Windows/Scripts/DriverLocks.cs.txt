@@ -1,0 +1,126 @@
+using System;
+using System.Text;
+using System.IO;
+using System.Diagnostics;
+using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Runtime.InteropServices;
+using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
+
+// Compiled only inside the already authorized elevated removal backend.
+// Restart Manager identifies holders; only a dedicated Windows driver host
+// whose loaded driver modules are all on the approved list may be terminated.
+public static class IsafomDriverLocks {
+ [StructLayout(LayoutKind.Sequential)] struct DriverInfo {
+  public uint Version;
+  public IntPtr Name,Environment,Driver,Data,Config,Help,Dependencies,Monitor,Type;
+ }
+ [DllImport("winspool.drv",EntryPoint="EnumPrinterDriversW",CharSet=CharSet.Unicode,SetLastError=true)]
+ [return:MarshalAs(UnmanagedType.Bool)] static extern bool EnumDrivers(string server,string environment,uint level,IntPtr buffer,uint bytes,out uint needed,out uint count);
+ // This enumeration does not create a WMI client that can retain vendor DLLs.
+ public static string[] ReferencedFiles() {
+  uint needed,count;
+  if(EnumDrivers(null,"all",3,IntPtr.Zero,0,out needed,out count))return new string[0];
+  if(Marshal.GetLastWin32Error()!=122||needed==0||needed>4*1024*1024)throw new InvalidOperationException("DriverInventoryUnavailable");
+  IntPtr buffer=Marshal.AllocHGlobal(checked((int)needed));
+  try {
+   uint capacity=needed;
+   if(!EnumDrivers(null,"all",3,buffer,capacity,out needed,out count)||count>4096)throw new InvalidOperationException("DriverInventoryUnavailable");
+   int size=Marshal.SizeOf(typeof(DriverInfo));
+   if((long)count*size>capacity)throw new InvalidOperationException("DriverInventoryUnavailable");
+   var files=new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+   for(int i=0;i<count;i++) {
+    var driver=(DriverInfo)Marshal.PtrToStructure(IntPtr.Add(buffer,checked(i*size)),typeof(DriverInfo));
+    foreach(var pointer in new[]{driver.Driver,driver.Data,driver.Config,driver.Help}) {
+     string path=ReadBufferString(pointer,buffer,capacity);if(!String.IsNullOrEmpty(path))files.Add(path);
+    }
+    IntPtr next=driver.Dependencies;
+    if(next!=IntPtr.Zero)for(int j=0;j<2048;j++) {
+     string path=ReadBufferString(next,buffer,capacity);
+     if(path.Length==0)break;
+     files.Add(path);next=IntPtr.Add(next,checked((path.Length+1)*2));
+     if(j==2047)throw new InvalidOperationException("DriverInventoryUnavailable");
+    }
+   }
+   var result=new string[files.Count];files.CopyTo(result);return result;
+  }finally{Marshal.FreeHGlobal(buffer);}
+ }
+ static string ReadBufferString(IntPtr pointer,IntPtr buffer,uint capacity) {
+  if(pointer==IntPtr.Zero)return String.Empty;
+  long offset=pointer.ToInt64()-buffer.ToInt64();
+  if(offset<0||offset>=capacity||(offset&1)!=0)throw new InvalidOperationException("DriverInventoryUnavailable");
+  int maximum=checked((int)((capacity-offset)/2));
+  for(int length=0;length<maximum;length++)if(Marshal.ReadInt16(pointer,checked(length*2))==0)return Marshal.PtrToStringUni(pointer,length);
+  throw new InvalidOperationException("DriverInventoryUnavailable");
+ }
+ [StructLayout(LayoutKind.Sequential)] public struct Unique { public uint Pid; public FILETIME Started; }
+ [StructLayout(LayoutKind.Sequential,CharSet=CharSet.Unicode)] public struct Info {
+  public Unique Process;
+  [MarshalAs(UnmanagedType.ByValTStr,SizeConst=256)] public string Name;
+  [MarshalAs(UnmanagedType.ByValTStr,SizeConst=64)] public string Service;
+  public uint Type,Status,Session;
+  [MarshalAs(UnmanagedType.Bool)] public bool Restartable;
+ }
+ [DllImport("rstrtmgr.dll",CharSet=CharSet.Unicode)] static extern int RmStartSession(out uint handle,int flags,StringBuilder key);
+ [DllImport("rstrtmgr.dll",CharSet=CharSet.Unicode)] static extern int RmRegisterResources(uint handle,uint files,string[] paths,uint apps,Unique[] ids,uint services,string[] names);
+ [DllImport("rstrtmgr.dll")] static extern int RmGetList(uint handle,out uint needed,ref uint count,[In,Out] Info[] apps,ref uint reason);
+ [DllImport("rstrtmgr.dll")] static extern int RmEndSession(uint handle);
+ public static int Release(string[] files,string[] hashes) {
+  uint session;
+  if(files.Length==0)return 0;
+  if(files.Length!=hashes.Length)return -1;
+  if(RmStartSession(out session,0,new StringBuilder(33))!=0)return -1;
+  var processes=new List<Process>();
+  try {
+   if(RmRegisterResources(session,(uint)files.Length,files,0,null,0,null)!=0)return -1;
+   uint needed,count=0,reason=0;
+   int error=RmGetList(session,out needed,ref count,null,ref reason);
+   if(error==0)return 0;
+   if(error!=234||needed>32)return -1;
+   var rows=new Info[needed];count=needed;
+   if(RmGetList(session,out needed,ref count,rows,ref reason)!=0)return -1;
+   var allowed=new HashSet<string>(files,StringComparer.OrdinalIgnoreCase);
+   var expectedHashes=new Dictionary<string,string>(StringComparer.OrdinalIgnoreCase);
+   for(int i=0;i<files.Length;i++)expectedHashes[files[i]]=hashes[i];
+   string windows=Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+   string expected=Path.Combine(windows,"System32","PrintIsolationHost.exe");
+   string spool=Path.Combine(windows,"System32","spool","DRIVERS")+Path.DirectorySeparatorChar;
+   string store=Path.Combine(windows,"System32","DriverStore")+Path.DirectorySeparatorChar;
+   for(int i=0;i<count;i++) {
+    Process process=null;
+    try {
+     process=Process.GetProcessById(checked((int)rows[i].Process.Pid));
+     long started=((long)rows[i].Process.Started.dwHighDateTime<<32)|(uint)rows[i].Process.Started.dwLowDateTime;
+     if(process.StartTime.ToFileTime()!=started)continue;
+     string executable=process.MainModule.FileName;
+     bool isolatedHost=String.Equals(executable,expected,StringComparison.OrdinalIgnoreCase);
+     bool vendorInstaller=String.Equals(Path.GetFileName(executable),"KDSInst.exe",StringComparison.OrdinalIgnoreCase)&&allowed.Contains(executable);
+     if(vendorInstaller) {
+      using(var stream=File.OpenRead(executable))using(var sha=SHA256.Create()) {
+       string hash=BitConverter.ToString(sha.ComputeHash(stream)).Replace("-","");
+       vendorInstaller=String.Equals(hash,expectedHashes[executable],StringComparison.Ordinal);
+      }
+     }
+     if(!isolatedHost&&!vendorInstaller)continue;
+     bool vendor=vendorInstaller, dedicated=true;
+     foreach(ProcessModule module in process.Modules) {
+      string path=module.FileName;
+      if(!path.StartsWith(windows+Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase)&&!allowed.Contains(path)){dedicated=false;break;}
+      if(path.StartsWith(spool,StringComparison.OrdinalIgnoreCase)||path.StartsWith(store,StringComparison.OrdinalIgnoreCase)) {
+       if(!allowed.Contains(path)){dedicated=false;break;}
+       vendor=true;
+      }
+     }
+     if(vendor&&dedicated){processes.Add(process);process=null;}
+    } catch { /* Unknown holders, including WMI, are never terminated. */ }
+    finally {if(process!=null)process.Dispose();}
+   }
+   int closed=0;
+   foreach(var process in processes) {
+    if(!process.HasExited){process.Kill();if(!process.WaitForExit(5000))return -1;closed++;}
+   }
+   return closed;
+  } catch { return -1; }
+  finally {foreach(var process in processes)process.Dispose();RmEndSession(session);}
+ }
+}

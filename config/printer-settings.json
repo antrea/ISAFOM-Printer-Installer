@@ -1,0 +1,15 @@
+{
+  "PrinterName": "Kyocera TASKalfa 3554ci KX",
+  "DriverName": "Kyocera TASKalfa 3554ci KX",
+  "DriverVersion": "8.5.2405.0",
+  "Host": "stampante.isafom.cnr.it",
+  "FallbackIPv4": "140.164.75.11",
+  "AllowFallbackOnDnsFailure": true,
+  "PortName": "stampante.isafom.cnr.it",
+  "PortNumber": 9100,
+  "SnmpCommunity": "isafom",
+  "SnmpIndex": 1,
+  "DriverUri": "",
+  "DriverArchiveSha256": "7100E66596C06252621B604D6CF19EA30527949D56319D83873909A66FC3092E",
+  "InfRelativePath": "Kx85_UPD_8.5.2405_en_RC2_WHQL/64bit/OEMSETUP.INF"
+}

@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <Version>0.2.7-rc1</Version>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>
+    <StartupObject>Isafom.Windows.Program</StartupObject>
+    <AssemblyName>Installa_Stampante_ISAFOM</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets/IsafomPrinter.ico</ApplicationIcon>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PlatformTarget>x64</PlatformTarget>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <PublishTrimmed>false</PublishTrimmed>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Isafom.Core/Isafom.Core.csproj" />
+    <Compile Include="../Isafom.KxSentinel/NativeTarget.cs" Link="Kx85/NativeTarget.cs" />
+    <Compile Include="../Isafom.KxSentinel/NativeWorker.cs" Link="Kx85/NativeWorker.cs" />
+    <Compile Include="../Isafom.KxSentinel/PrinterStore.cs" Link="Kx85/PrinterStore.cs" />
+    <Compile Include="../Isafom.KxSentinel/TrialPolicy.cs" Link="Kx85/TrialPolicy.cs" />
+    <Compile Include="../Isafom.KxSentinel/FilePortPolicy.cs" Link="Kx85/FilePortPolicy.cs" />
+    <Compile Include="../Isafom.ConfigExtractor/Kx85NativeReadback.cs" Link="Kx85/NativeReadback.cs" />
+    <Compile Include="../Isafom.ConfigExtractor/PersonalReadback.cs" Link="Kx85/PersonalReadback.cs" />
+    <Compile Include="../../research/reverse-kx85/codec/Kx85PrivateCodeCodec.cs" Link="Kx85/PrivateCodeCodec.cs" />
+    <Compile Include="../Isafom.Collector/WindowPlacement.cs" Link="UI/WindowPlacement.cs" />
+    <EmbeddedResource Include="Scripts/PrinterBackend.ps1" />
+    <EmbeddedResource Include="Scripts/RemovalBackend.ps1" />
+    <EmbeddedResource Include="Scripts/DriverLocks.cs.txt" LogicalName="Isafom.Windows.Scripts.DriverLocks.cs.txt" WithCulture="false" />
+    <EmbeddedResource Include="../../driver/KX_8.7.0917_x64.zip" LogicalName="Isafom.Windows.Driver.Kx87X64.zip" />
+    <EmbeddedResource Include="../../driver/KX_8.5.2405_x64.zip" LogicalName="Isafom.Windows.Driver.Kx85X64.zip" />
+    <EmbeddedResource Include="../../driver/KX_SpoolFiles.json" LogicalName="Isafom.Windows.Driver.KnownSpoolFiles.json" />
+    <Resource Include="Assets/IsafomPrinter.ico" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,28 @@
+{
+  "SchemaVersion": 1,
+  "Release": "0.1.0-dev",
+  "Overall": "IN ATTESA DI VALIDAZIONE REALE",
+  "Instructions": "Registrare solo esiti e riferimenti non personali. Non aggiungere nomi, Account ID, PIN, password, screenshot o export proprietari. Questo file non sblocca il programma.",
+  "Checks": [
+    { "Id": "driver-version-and-signature", "Status": "IN ATTESA DI VALIDAZIONE REALE" },
+    { "Id": "raw-9100-snmp-target", "Status": "IN ATTESA DI VALIDAZIONE REALE" },
+    { "Id": "unique-queue-idempotent", "Status": "IN ATTESA DI VALIDAZIONE REALE" },
+    { "Id": "exact-user-name-driver", "Status": "IN ATTESA DI VALIDAZIONE REALE" },
+    { "Id": "panel-user-name-versus-document-title", "Status": "IN ATTESA DI VALIDAZIONE REALE" },
+    { "Id": "job-accounting-enabled-specific-id", "Status": "IN ATTESA DI VALIDAZIONE REALE" },
+    { "Id": "job-accounting-preferences", "Status": "IN ATTESA DI VALIDAZIONE REALE" },
+    { "Id": "private-print-no-prompt-specific-password", "Status": "IN ATTESA DI VALIDAZIONE REALE" },
+    { "Id": "same-account-and-password-leading-zeros", "Status": "IN ATTESA DI VALIDAZIONE REALE" },
+    { "Id": "monochrome-default-color-still-selectable", "Status": "IN ATTESA DI VALIDAZIONE REALE" },
+    { "Id": "preferences-close-reopen", "Status": "IN ATTESA DI VALIDAZIONE REALE" },
+    { "Id": "windows-reboot", "Status": "IN ATTESA DI VALIDAZIONE REALE" },
+    { "Id": "new-user-session-standard-user", "Status": "IN ATTESA DI VALIDAZIONE REALE" },
+    { "Id": "multiuser-secrets-isolated", "Status": "IN ATTESA DI VALIDAZIONE REALE" },
+    { "Id": "administrator-reassigns-id-current-user-only", "Status": "IN ATTESA DI VALIDAZIONE REALE" },
+    { "Id": "uac-different-local-admin-original-user-profile", "Status": "IN ATTESA DI VALIDAZIONE REALE" },
+    { "Id": "interrupted-install-and-repair", "Status": "IN ATTESA DI VALIDAZIONE REALE" },
+    { "Id": "other-printers-jobs-and-default-unchanged", "Status": "IN ATTESA DI VALIDAZIONE REALE" },
+    { "Id": "authorized-physical-print-accounting-and-release", "Status": "IN ATTESA DI VALIDAZIONE REALE" },
+    { "Id": "logs-reports-and-package-no-personal-secrets", "Status": "IN ATTESA DI VALIDAZIONE REALE" }
+  ]
+}

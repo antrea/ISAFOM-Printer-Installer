@@ -1,0 +1,746 @@
+{
+  "Version": "0.2.7-rc1",
+  "Scope": "Git-normalized public source blobs, excluding this manifest and Git metadata",
+  "Files": [
+    {
+      "Path": ".gitattributes",
+      "Bytes": 147,
+      "Sha256": "65420625EF84CE183DEC45D49D72A1C4081C22FAFAD3BA6AD26FC85C74CEE506"
+    },
+    {
+      "Path": ".gitignore",
+      "Bytes": 525,
+      "Sha256": "FE711E574B214C7F7A874D477A19D96C8AEC24B1F8886A34E1938BF55D1410CD"
+    },
+    {
+      "Path": "BUILD.md",
+      "Bytes": 4226,
+      "Sha256": "69B662A7E4CE34E8DE8937D1C3BC40B325E07D20126887513052DA16C5D2419A"
+    },
+    {
+      "Path": "CONTRIBUTING.md",
+      "Bytes": 806,
+      "Sha256": "9B601DB3AE5CB991015C3911A201368B30875ACFDFCBF5DA01408BECBA563F1F"
+    },
+    {
+      "Path": "Directory.Build.props",
+      "Bytes": 403,
+      "Sha256": "9C248F7B98C200A3633B7DBE453F840AC9AAD2FB3F1B2992FB43A7343499EB88"
+    },
+    {
+      "Path": "FILELIST.md",
+      "Bytes": 1657,
+      "Sha256": "7AAA278CD2EE67FAB40ABC2FB628AF9544A610F815FF71D27EE5B682369AA490"
+    },
+    {
+      "Path": "LICENSE.md",
+      "Bytes": 706,
+      "Sha256": "962DB691D1E2DAF42176CFD4E5FF37DACEDAD26D2A56D64924E03E709B2A8BE8"
+    },
+    {
+      "Path": "NuGet.Config",
+      "Bytes": 199,
+      "Sha256": "2A0794BD92EE86C6D8AE95EFB5A96DD7664BD877A4FF43F3AA37A1E2CF839D3E"
+    },
+    {
+      "Path": "README.md",
+      "Bytes": 4134,
+      "Sha256": "7233F6D4BE535B8D3852757D9616FA7D55B5F96C033CD994F6BEB9F85C9A5B3F"
+    },
+    {
+      "Path": "SECURITY.md",
+      "Bytes": 594,
+      "Sha256": "14E61D702C87F2A8EDE84DA9A4A104E2E811E8BAA55FC797EFC48CA556328221"
+    },
+    {
+      "Path": "THIRD_PARTY_NOTICES.md",
+      "Bytes": 2163,
+      "Sha256": "AFD6723A04332315F1952C2C0F633ACF1B67161E5849C2CED79C1396BF61ED4F"
+    },
+    {
+      "Path": "VALIDATION.md",
+      "Bytes": 3666,
+      "Sha256": "575E0FAAEEE390823F26164AFBB060C9BF5752E87C46DF1EAFB0CBF8A4DE34CE"
+    },
+    {
+      "Path": "build/Build-Installer.ps1",
+      "Bytes": 3343,
+      "Sha256": "35B5C83E607AA123EA2DD852410AD7C2060536B092AB82C4BF6B9077F0E5A433"
+    },
+    {
+      "Path": "build/Build-Tools.ps1",
+      "Bytes": 2236,
+      "Sha256": "FD567EC69B5822257CC6C3C54C3C414C73528795BD872D78E42F04BF10FC10CD"
+    },
+    {
+      "Path": "build/Generate-AppIcon.ps1",
+      "Bytes": 3312,
+      "Sha256": "730779B355C4890A18C4D9818B0A8F9630AD2D0C41590FB17C4A3C574C754BC7"
+    },
+    {
+      "Path": "build/Package-PublicSources.ps1",
+      "Bytes": 1315,
+      "Sha256": "B7A17C3AEC87541E5FE99B058D297EE3DA6B0EFA5BC0114D775360FF44F78B96"
+    },
+    {
+      "Path": "build/Prepare-Kx87.ps1",
+      "Bytes": 3276,
+      "Sha256": "3728FB2F5CC5AF4A01A94B050DE8F4ECEEAAEECE5FE70EAE867519841685F177"
+    },
+    {
+      "Path": "build/Prepare-SpoolFileManifest.ps1",
+      "Bytes": 2124,
+      "Sha256": "D843321CB06786124B446971921C919E3F4BC3CD3C3C2EE52D2DDFE9E4F48209"
+    },
+    {
+      "Path": "build/Set-AdminConfiguration.ps1",
+      "Bytes": 4361,
+      "Sha256": "5C7941240E901B0532EA1419E2BAACEE7D16F76A4390DBBE39136B525EE7179F"
+    },
+    {
+      "Path": "build/Test-DriverPayloads.ps1",
+      "Bytes": 962,
+      "Sha256": "D4E6406693637D00319939342BF06D8EB09ECEC359C47507BEDD7FEAEF0CC80C"
+    },
+    {
+      "Path": "config/printer-settings.json",
+      "Bytes": 533,
+      "Sha256": "306CD01F97BE21FED084FD6814CF3B7BEABD394B4CA17D587F113E9054E4E99C"
+    },
+    {
+      "Path": "diagnostics/Confronta_Diagnostica_ISAFOM.ps1",
+      "Bytes": 6217,
+      "Sha256": "47F00F39ADC0F53E4FCA40B72B81516FDB5F4709433D31530CBF2DF60E776382"
+    },
+    {
+      "Path": "diagnostics/Diagnostica_Kyocera_ISAFOM.ps1",
+      "Bytes": 22781,
+      "Sha256": "EBD556CCA40ACD41DE4E6BA41B821ED33378B399EB203C623D17D5FB5EFFCE23"
+    },
+    {
+      "Path": "docs/ARCHITETTURA.md",
+      "Bytes": 2892,
+      "Sha256": "0A6AF7645B381FA640C364CCA5DC2613F3B69E9302DD72BA8D40F44498B98217"
+    },
+    {
+      "Path": "docs/DIAGNOSTICA.md",
+      "Bytes": 2836,
+      "Sha256": "033BE19002BBD204E5A6ADBDE7E3B3BAEAEE40A04CCE3AF16E91932A19787078"
+    },
+    {
+      "Path": "docs/GUIDA_AMMINISTRATORE.md",
+      "Bytes": 4937,
+      "Sha256": "F6039E13877250905D2F9F619E5DEEB64CD6B0CC4D116CD37BC4A603C88ACB1B"
+    },
+    {
+      "Path": "docs/GUIDA_UTENTE.md",
+      "Bytes": 4358,
+      "Sha256": "A8A93C37A346F92940163E6C4B7A3894640E1D81A7C5837F2B5712AB6D2B973A"
+    },
+    {
+      "Path": "docs/INSTALLER_027_RC1.md",
+      "Bytes": 3418,
+      "Sha256": "5B86E951E6ADFF0C1EA3332F73A71AB11C8C26D43C3A0B60A3ABB256E9E92612"
+    },
+    {
+      "Path": "docs/images/installazione.png",
+      "Bytes": 68621,
+      "Sha256": "F31D3ADF66E38087B7187BDC1F4EE74DD6D8AB52D0F347B2C25869D611551FDF"
+    },
+    {
+      "Path": "docs/licenses/DOTNET-LICENSE.txt",
+      "Bytes": 9455,
+      "Sha256": "C50E462F7D9D966B50F4A9874CCFB896B83455AC0D2E7F30AAF4BB7AD5FBD12A"
+    },
+    {
+      "Path": "docs/licenses/DOTNET-ThirdPartyNotices.txt",
+      "Bytes": 77436,
+      "Sha256": "2DC8F8C5A39401E928B5784AB564EB8B3CEB99EAD3DF8F260E0CAB7E0BBECC7A"
+    },
+    {
+      "Path": "driver/KX_8.5.2405_x64.manifest.json",
+      "Bytes": 122216,
+      "Sha256": "0459532A875223877F0516F20A6C758095FD1C6ED72284E62CC450B9020AA268"
+    },
+    {
+      "Path": "driver/KX_8.7.0917_x64.manifest.json",
+      "Bytes": 134738,
+      "Sha256": "A25C941E09D075774532F73A9CE3333DCB46680A024A194A08734626B1B45F7E"
+    },
+    {
+      "Path": "driver/KX_SpoolFiles.json",
+      "Bytes": 9439,
+      "Sha256": "F23A28CF6F3C2BAA2E0B0F12C6835C750EBB1895C8760FC7C77E19724B9F606B"
+    },
+    {
+      "Path": "driver/README.md",
+      "Bytes": 2391,
+      "Sha256": "80692930D0BFB718AD315B51BFDD5006A0DA799A71DCCA7FEFC659B7D97AE201"
+    },
+    {
+      "Path": "driver/spool-file-names.txt",
+      "Bytes": 858,
+      "Sha256": "D21AA93686763AE00FC6F88337A9813037EB8BC1C1F53C40331582F5BC8E4CF5"
+    },
+    {
+      "Path": "global.json",
+      "Bytes": 69,
+      "Sha256": "28BB64053A15030A596B37949840EDD6AF92A2E93D48B24F6F36D81FEB33EC08"
+    },
+    {
+      "Path": "research/reverse-kx85/README.md",
+      "Bytes": 1589,
+      "Sha256": "2D511F8A580BEB5CFF847D16CF16F9614DA14100F435A3431FF15F563766D70E"
+    },
+    {
+      "Path": "research/reverse-kx85/analyze_native.py",
+      "Bytes": 6576,
+      "Sha256": "5D9711B5EC28AA2A0DB78328079DCA9B6D55E9BCC376F7AE77358A5C486B264A"
+    },
+    {
+      "Path": "research/reverse-kx85/codec/CodecProof.csproj",
+      "Bytes": 238,
+      "Sha256": "10613483B461E1267265128A9B79E76B535A1223A8C24F9B749B784FA36F1D47"
+    },
+    {
+      "Path": "research/reverse-kx85/codec/Kx85PrivateCodeCodec.cs",
+      "Bytes": 4253,
+      "Sha256": "7A5A8D6CB22E3760A861A7FE4DDB3CE7F9C420794A74B8DED9ECEBD0BB4E2005"
+    },
+    {
+      "Path": "research/reverse-kx85/codec/Program.cs",
+      "Bytes": 1719,
+      "Sha256": "E8400776BC914A8AD45A7A473F7F30E07D71AD72B50B91316A03D06B25FFA8C2"
+    },
+    {
+      "Path": "research/reverse-kx85/emulate_fields.py",
+      "Bytes": 12577,
+      "Sha256": "9593C3F9E9EE6FC2D990CE8FCF694DE0FCFFEA62DA5A3657DC1E6DC960C4C492"
+    },
+    {
+      "Path": "research/reverse-kx85/emulate_trial_save.py",
+      "Bytes": 9829,
+      "Sha256": "5FA176D314F1F4B3454DECCC790902F0FF282D37AF2487936C1BCF65D3A192FA"
+    },
+    {
+      "Path": "research/reverse-kx85/make_analysis_slice.py",
+      "Bytes": 4090,
+      "Sha256": "B7F297EF4D3BCFE1A5FA3F8C799727C54B1657BF3E614CB2C363B171D8A4D614"
+    },
+    {
+      "Path": "research/reverse-kx85/rea_native_session.py",
+      "Bytes": 3455,
+      "Sha256": "11601B4882D540AF706D6E06AEADA11F07A3A31530803DB42ABB6C48886AF79C"
+    },
+    {
+      "Path": "research/reverse-kx85/verify_codec_against_native.py",
+      "Bytes": 3339,
+      "Sha256": "C657AA37B769D0661C7E2EB008C9D503B38A5F946A61F1B4F0B1492DF36FE787"
+    },
+    {
+      "Path": "src/Isafom.Collector/AssemblyInfo.cs",
+      "Bytes": 96,
+      "Sha256": "DEF7D5DFC3E1EF842020B61C673826550A750CD3846F52DCDB0048B372D3BDF1"
+    },
+    {
+      "Path": "src/Isafom.Collector/CollectorSession.cs",
+      "Bytes": 9551,
+      "Sha256": "ADFD2D541D89C14D6B6008360B9AD063AFA6B9A30517539F54698F06BA83D414"
+    },
+    {
+      "Path": "src/Isafom.Collector/CollectorWindow.xaml",
+      "Bytes": 6175,
+      "Sha256": "75762DE03C8F0300C56C6D9F093BA71FAAFE20DDF7686C48D067649A95B4CAF7"
+    },
+    {
+      "Path": "src/Isafom.Collector/CollectorWindow.xaml.cs",
+      "Bytes": 7537,
+      "Sha256": "56C587F9730AAD7413ED647AAEE9434BA953A482DB50F3DFB5DF1D08DC1E90E2"
+    },
+    {
+      "Path": "src/Isafom.Collector/Isafom.Collector.csproj",
+      "Bytes": 1130,
+      "Sha256": "852BE1D0DE3FD9086DA90430FB9DF0D170CE9589A63B78AA75B85E24A54F6FE2"
+    },
+    {
+      "Path": "src/Isafom.Collector/Models.cs",
+      "Bytes": 10776,
+      "Sha256": "E7452CC632C75DCF57B5A01F92343F34DCE375CB53524C720C67D0DAA864E2B1"
+    },
+    {
+      "Path": "src/Isafom.Collector/PrintSchemaReader.cs",
+      "Bytes": 6693,
+      "Sha256": "459EC364E0C07B41A3B99AB8915967ECBBFB33A21E9432B7FE8E8403D96CC851"
+    },
+    {
+      "Path": "src/Isafom.Collector/Program.cs",
+      "Bytes": 2705,
+      "Sha256": "4AC6D94E37D662333EF92BFFFBDEEF91D83111C991B24FE2343C6299AFA47CE1"
+    },
+    {
+      "Path": "src/Isafom.Collector/QueueDiscovery.cs",
+      "Bytes": 2918,
+      "Sha256": "FEFA61F147737FDB7D7B9A49333C054BC3F4C06C55F9C6019F6D020BE2B2B852"
+    },
+    {
+      "Path": "src/Isafom.Collector/StorageReader.cs",
+      "Bytes": 11442,
+      "Sha256": "5312DDABF53350EF42BC45D5438D8B95E8D235CC87F3982CFE7771F25A8D8301"
+    },
+    {
+      "Path": "src/Isafom.Collector/WindowPlacement.cs",
+      "Bytes": 6395,
+      "Sha256": "48814A2141BFD8C260489C89A40E8B93ADDF7B3D023A8D08548612C84598518A"
+    },
+    {
+      "Path": "src/Isafom.ConfigExtractor/AssemblyInfo.cs",
+      "Bytes": 154,
+      "Sha256": "5865E3E50F2F6A4E7519E8712F1192E044237F3AB10535BF244DCA1A4DAA94D3"
+    },
+    {
+      "Path": "src/Isafom.ConfigExtractor/DirectConversionProbe.cs",
+      "Bytes": 11715,
+      "Sha256": "D93EBF5671D4BA1449D9CCA09148F3011DD282187F075217499B7DD7E6452F23"
+    },
+    {
+      "Path": "src/Isafom.ConfigExtractor/DirectObservation.cs",
+      "Bytes": 4987,
+      "Sha256": "265D8A6DBD30D2D40D9091C265FD19C30C15FEEE78044AB24FFE13C8848D7B70"
+    },
+    {
+      "Path": "src/Isafom.ConfigExtractor/Dossier.cs",
+      "Bytes": 12131,
+      "Sha256": "DD416541AAB2988D5BFD4793380DDC3EE8575B2C861C11FA4978FDF655A81ADE"
+    },
+    {
+      "Path": "src/Isafom.ConfigExtractor/IdentityVerification.cs",
+      "Bytes": 4221,
+      "Sha256": "D642B69503F6378E25DDBDA4916C2D42F16B20394EEC7A34B1D6F4251C0FB79E"
+    },
+    {
+      "Path": "src/Isafom.ConfigExtractor/IdentityVerifierWindow.cs",
+      "Bytes": 6188,
+      "Sha256": "135ED4445562EE97552ACE4DCEFFCCCFDAB751857CEE2A269F6456B07BC978B4"
+    },
+    {
+      "Path": "src/Isafom.ConfigExtractor/Isafom.ConfigExtractor.csproj",
+      "Bytes": 647,
+      "Sha256": "8A35DDA4DEC2EDFCB47125D0FC6790FD6B541C819ADC13F90497C626104BD3D9"
+    },
+    {
+      "Path": "src/Isafom.ConfigExtractor/Kx85NativeReadback.cs",
+      "Bytes": 10129,
+      "Sha256": "4B497742C8BD09986C82D639F81649615FE96796555C64F0BF8D521AE01473E8"
+    },
+    {
+      "Path": "src/Isafom.ConfigExtractor/MarkerLocations.cs",
+      "Bytes": 3797,
+      "Sha256": "DAA77D070199F68CD2C234DEA673B07470931586F2F3339C0B794E046BF95484"
+    },
+    {
+      "Path": "src/Isafom.ConfigExtractor/MarkerObservation.cs",
+      "Bytes": 4270,
+      "Sha256": "30E4850168671B2E8A3665903DDF93895B00FE47C111B502D94CD1A059F1F8EE"
+    },
+    {
+      "Path": "src/Isafom.ConfigExtractor/PersonalReadback.cs",
+      "Bytes": 7679,
+      "Sha256": "D77909038D2F57C7FFA300932CA52AB91E45A4C6CFEB5C5BEAB8FD4FDA5B9E27"
+    },
+    {
+      "Path": "src/Isafom.ConfigExtractor/Program.cs",
+      "Bytes": 9443,
+      "Sha256": "9EAEB0AE8D8A90AB39E7742C8DBC746E6140B8CEF0304EB61EFC070A2579057B"
+    },
+    {
+      "Path": "src/Isafom.ConfigExtractor/PublicDevMode.cs",
+      "Bytes": 6329,
+      "Sha256": "770419FCF0A550D55D5043D6E6A6DBECA7CB199AC82A13850D8745EAE38A4F2C"
+    },
+    {
+      "Path": "src/Isafom.ConfigExtractor/SentinelSnapshot.cs",
+      "Bytes": 9319,
+      "Sha256": "C4A0805B644D48C36B00392966123EB54560D9BEFDF53D234C37DC82A01681FB"
+    },
+    {
+      "Path": "src/Isafom.ConfigExtractor/SentinelWindow.cs",
+      "Bytes": 8516,
+      "Sha256": "FD7B72596AFAFAAD6C4BFC27156B51A168641D8196134A3378B81FE150F1976F"
+    },
+    {
+      "Path": "src/Isafom.ConfigExtractor/StandardSettings.cs",
+      "Bytes": 7443,
+      "Sha256": "B2BFF88495469E8F0EB6D3BEED4DC765244CFB24C55C93E9737558DC18400C61"
+    },
+    {
+      "Path": "src/Isafom.Core/Configuration.cs",
+      "Bytes": 8865,
+      "Sha256": "A4738537A8FF6450C485E04137B32C3614F7C545CE25BF732F5B0AAE87B03C2B"
+    },
+    {
+      "Path": "src/Isafom.Core/DriverProfiles.cs",
+      "Bytes": 1638,
+      "Sha256": "0498BF5FD342E4C9883BDE9A549B27741F8E6482CA432FC53432C298D45D3AEE"
+    },
+    {
+      "Path": "src/Isafom.Core/Installation.cs",
+      "Bytes": 9982,
+      "Sha256": "201D0C31071B678B358D05796030AAA92E892DB6EBEFC7D3CF2E695579C4A5FC"
+    },
+    {
+      "Path": "src/Isafom.Core/Isafom.Core.csproj",
+      "Bytes": 241,
+      "Sha256": "22145398616976B20CCDAD05BA1EDD32FBF5277BD8830DB15FC58ABE17F9E411"
+    },
+    {
+      "Path": "src/Isafom.Core/VerificationPreflight.cs",
+      "Bytes": 1765,
+      "Sha256": "A57B5AB3E64694AFB059174FA50186C2197F4D0884DFE7C41E0DF74775807F72"
+    },
+    {
+      "Path": "src/Isafom.KxSentinel/AssemblyInfo.cs",
+      "Bytes": 97,
+      "Sha256": "12A6F0C3AD45F89DCCFFC9931CF1F18DEABB1E6161877F2BFE7B534052C285D2"
+    },
+    {
+      "Path": "src/Isafom.KxSentinel/FilePortPolicy.cs",
+      "Bytes": 3109,
+      "Sha256": "AB6B6E83687987585D2A2E247D3230E2B742B9ECFC58678F3853A413B19B8881"
+    },
+    {
+      "Path": "src/Isafom.KxSentinel/Isafom.KxSentinel.csproj",
+      "Bytes": 775,
+      "Sha256": "1DE59AB73CC0442B707BA4A5FCEBFE3C60A1323C020F87C8AE2A10FE231B0BDC"
+    },
+    {
+      "Path": "src/Isafom.KxSentinel/LocalLabReadback.cs",
+      "Bytes": 5860,
+      "Sha256": "1FB36994738A5DD1C6CC7EA24EC84E561E73275E5856D32D847347D62C1579B7"
+    },
+    {
+      "Path": "src/Isafom.KxSentinel/NativeTarget.cs",
+      "Bytes": 272,
+      "Sha256": "A8C0DF55E7592A64B4B0BA0B7D28B337B4796EEE98F21CAD4113A0BBA552CDE8"
+    },
+    {
+      "Path": "src/Isafom.KxSentinel/NativeWorker.cs",
+      "Bytes": 11925,
+      "Sha256": "31F3ECBC6A4A27920D8E924670CD074C200F137CADE3767DBDFB83EBD1B4B510"
+    },
+    {
+      "Path": "src/Isafom.KxSentinel/PrinterStore.cs",
+      "Bytes": 20145,
+      "Sha256": "42CF21937D0949FAE8C6C26B8D11F9BE4C590E1A3D4F347F133B5950253E67FB"
+    },
+    {
+      "Path": "src/Isafom.KxSentinel/Program.cs",
+      "Bytes": 15541,
+      "Sha256": "928B09B25DD8CCC5BC29E36BDB1D16B096A04E302EC1FD78D342835153C7B0F6"
+    },
+    {
+      "Path": "src/Isafom.KxSentinel/ReferenceSnapshot.cs",
+      "Bytes": 2633,
+      "Sha256": "B664B713579D0928DBB8B7B051ADEC80DC30C712B4F19F6B4654D70978AB4806"
+    },
+    {
+      "Path": "src/Isafom.KxSentinel/TrialPolicy.cs",
+      "Bytes": 1942,
+      "Sha256": "915CACE6612D195790D4063F581E043D3C4A3226FBAA099E9DE7455043499F38"
+    },
+    {
+      "Path": "src/Isafom.Windows/AdaptiveLayout.cs",
+      "Bytes": 1086,
+      "Sha256": "F730D264C00674AC65E9267009E152F6863B12A13AA9B6FFF1FCA1D49BB36586"
+    },
+    {
+      "Path": "src/Isafom.Windows/AssemblyInfo.cs",
+      "Bytes": 96,
+      "Sha256": "F79587C8F1E71D5931EF9A09A136E76314157B86984FB5A22A82174EBA0D2761"
+    },
+    {
+      "Path": "src/Isafom.Windows/Assets/IsafomPrinter.ico",
+      "Bytes": 8707,
+      "Sha256": "3CFE1413EE44C4097B81CEB8A1434189FB7FF21732E53FF9348889DFFA7B2C6B"
+    },
+    {
+      "Path": "src/Isafom.Windows/Assets/IsafomPrinter.png",
+      "Bytes": 4048,
+      "Sha256": "D09FFD9617F85BACC225A90E4D192B3933A4C6A921C2AA0CB700D4F0BA5BFEDE"
+    },
+    {
+      "Path": "src/Isafom.Windows/InstallationJourney.cs",
+      "Bytes": 3908,
+      "Sha256": "EC5054C3BC451629AF351DFC532DF513640DE90C2A9894EC1E51D6948FEB3362"
+    },
+    {
+      "Path": "src/Isafom.Windows/Isafom.Windows.csproj",
+      "Bytes": 2580,
+      "Sha256": "33B5751980168A583312FABBEE220501FBCD6D84896B9C75766A759F5E757D40"
+    },
+    {
+      "Path": "src/Isafom.Windows/Kx85Preferences.cs",
+      "Bytes": 13923,
+      "Sha256": "F230BFE3073A4807F37323CB3586EE802FE3F49202B9EC2415629662CD68343F"
+    },
+    {
+      "Path": "src/Isafom.Windows/MainWindow.xaml",
+      "Bytes": 29317,
+      "Sha256": "14D7904C37FC96AEDD676B2BA49D3E92B6FB8D80B2465CEA7FE51517E2BB16EE"
+    },
+    {
+      "Path": "src/Isafom.Windows/MainWindow.xaml.cs",
+      "Bytes": 19095,
+      "Sha256": "0F2EF9693A9E16CF4D2A44E0BB31BBD62F83D88DEACA7027B53C3C55A313D99C"
+    },
+    {
+      "Path": "src/Isafom.Windows/NativeColor.cs",
+      "Bytes": 2219,
+      "Sha256": "BAE3B33C90816220BC67C692F4C8D1103CBE9652801D3C0DD61F56F3306B36F8"
+    },
+    {
+      "Path": "src/Isafom.Windows/ProcessIdentity.cs",
+      "Bytes": 989,
+      "Sha256": "9FEC043905701060DA5C16D19B3748563EDAAD899D1FBF211D347E4F071099D8"
+    },
+    {
+      "Path": "src/Isafom.Windows/Program.cs",
+      "Bytes": 7973,
+      "Sha256": "892B6817FDC13DC8F85F3BE31E8E42212037DFFEE7B9E8430D828798AA91FE49"
+    },
+    {
+      "Path": "src/Isafom.Windows/Removal.cs",
+      "Bytes": 11554,
+      "Sha256": "B5F8676C3F2363327F73D84067AED25E0A8D92E39B443E1E78E52610783E734F"
+    },
+    {
+      "Path": "src/Isafom.Windows/RemovalStorage.cs",
+      "Bytes": 2731,
+      "Sha256": "E4C27EA02BD0FFC7C827145F34BD8C09BF4AEA1649314BE44A51D0214332B135"
+    },
+    {
+      "Path": "src/Isafom.Windows/Scripts/DriverLocks.cs.txt",
+      "Bytes": 7304,
+      "Sha256": "C565F435B4C369082F7265853212E51AF19CDB3F584D801D97502DF91BB579B9"
+    },
+    {
+      "Path": "src/Isafom.Windows/Scripts/PrinterBackend.ps1",
+      "Bytes": 14141,
+      "Sha256": "483BF0BC5FC63F97A58FAA41F2D632D2D7F526EB630B249163867B862DDB8F98"
+    },
+    {
+      "Path": "src/Isafom.Windows/Scripts/RemovalBackend.ps1",
+      "Bytes": 28805,
+      "Sha256": "3AD9835CF4D6F4E9258C844162D32268276B82B84D50ED3D939F6CA104F3270D"
+    },
+    {
+      "Path": "src/Isafom.Windows/WindowsServices.cs",
+      "Bytes": 29882,
+      "Sha256": "49A705C8060C9B673C6B7327AA160ECFAC381EA20227775797712731665DBBCF"
+    },
+    {
+      "Path": "src/Isafom.Windows/app.manifest",
+      "Bytes": 900,
+      "Sha256": "BAEE322AF497DF9E5FC0AEC78D19C4CD63F6BC3B1D0D936F298E05FE88E7D96F"
+    },
+    {
+      "Path": "tests/Isafom.Collector.Tests/ConfigurationTests.cs",
+      "Bytes": 22116,
+      "Sha256": "34D826DC93A3B0AE35E9CDCD6188CFD865644FA2AE43B27CDE4DB9D99040D3B4"
+    },
+    {
+      "Path": "tests/Isafom.Collector.Tests/Isafom.Collector.Tests.csproj",
+      "Bytes": 473,
+      "Sha256": "283FEE4B00B06DA74CAD6AC6C4A9B2206D7EFD10F20FAD539EE8D5179E9D00C1"
+    },
+    {
+      "Path": "tests/Isafom.Collector.Tests/Program.cs",
+      "Bytes": 20939,
+      "Sha256": "302694C436E1BF894B57BE427F9AD432DEA40D278224AD71ADA3B6CF1E2B6FD8"
+    },
+    {
+      "Path": "tests/Isafom.Collector.Tests/WindowLayoutTests.cs",
+      "Bytes": 7445,
+      "Sha256": "5E203573CA1C2942CA0BC8AD3C222E2A12B1C4177D36096106926725DCAA7C34"
+    },
+    {
+      "Path": "tests/Isafom.Installer.Tests/GuiChecks.cs",
+      "Bytes": 14876,
+      "Sha256": "8A0D7CCAC5589AFA8D96322AD54E99A86AA84EB3A97424B1DBC9375DFC8BE869"
+    },
+    {
+      "Path": "tests/Isafom.Installer.Tests/Isafom.Installer.Tests.csproj",
+      "Bytes": 429,
+      "Sha256": "4AA02665D52F4E82B72E51736FA9CB50FA2D41A358CE3D872B610BA94B3F9E3A"
+    },
+    {
+      "Path": "tests/Isafom.Installer.Tests/Program.cs",
+      "Bytes": 20385,
+      "Sha256": "EF6FB5E20EA2C734380F5A71ADC888C294B9E462BCD38E4A9C18BE7F6F4A766C"
+    },
+    {
+      "Path": "tests/Isafom.KxReadback.Tests/Isafom.KxReadback.Tests.csproj",
+      "Bytes": 445,
+      "Sha256": "6AB4E9C0F59A15F7C7FDA7662A96F614EA9E8DA7746A5CCF053B276F7058B9E9"
+    },
+    {
+      "Path": "tests/Isafom.KxReadback.Tests/Program.cs",
+      "Bytes": 2571,
+      "Sha256": "D7BFE6CF7261B1DC35DB745019474D0FC07DBF99D7DBE5B570A3D1A53F4DA8C3"
+    },
+    {
+      "Path": "tests/Isafom.KxSentinel.Tests/Isafom.KxSentinel.Tests.csproj",
+      "Bytes": 473,
+      "Sha256": "68ADC2E4E87FDF1F3E57381B24E9C7A3746CDAE34150DE80F8E1ECA488C332F1"
+    },
+    {
+      "Path": "tests/Isafom.KxSentinel.Tests/Program.cs",
+      "Bytes": 7439,
+      "Sha256": "60316264D758027D1ED74400C6B1A8D03F3D1E53A7FAE3D3E627E1A2BCE966B6"
+    },
+    {
+      "Path": "tests/Isafom.Tests/Isafom.Tests.csproj",
+      "Bytes": 246,
+      "Sha256": "F9D8D3962084BEB0294F90F53D4ADD872365759F9F074BA57051B3C1DDE6E466"
+    },
+    {
+      "Path": "tests/Isafom.Tests/Program.cs",
+      "Bytes": 16873,
+      "Sha256": "516AD8F75E42BA67074AD2267E03C9FA22339AF13E51DF2C95A2C4C1976DBA98"
+    },
+    {
+      "Path": "tests/Isafom.Windows.Tests/Isafom.Windows.Tests.csproj",
+      "Bytes": 368,
+      "Sha256": "61F8469A04C419D448C382E4B308B09616F04AA8AF1C3E70ACE5CF771F372270"
+    },
+    {
+      "Path": "tests/Isafom.Windows.Tests/Program.cs",
+      "Bytes": 8185,
+      "Sha256": "72C8AACA55DFDF1D8B55D0FB2D71F56CC2B8435085CCB13AECCF66A890AB2405"
+    },
+    {
+      "Path": "tests/Test-AppIcon.ps1",
+      "Bytes": 2209,
+      "Sha256": "9303C816DFD97F8A857BF46DDB312E24E6D34B2EAC671D9D5DB0F61BBB9E7D2B"
+    },
+    {
+      "Path": "tests/Test-ConfigExtractorArtifacts.ps1",
+      "Bytes": 3465,
+      "Sha256": "25DC9C65AAB72BE25D0BA7BD1926926D932468B9A70ABFE279CAF73CC94F5160"
+    },
+    {
+      "Path": "tests/Test-Diagnostics.ps1",
+      "Bytes": 9937,
+      "Sha256": "3A59C1B1FCD5616A0E59A44989F4B5E576774B001E3875E46EB5217395FE88AC"
+    },
+    {
+      "Path": "tests/Test-DriverCatalog.ps1",
+      "Bytes": 2471,
+      "Sha256": "D466335366A7415FDC14A471D1899BB491D87239E61A84B30F938D1681ED002E"
+    },
+    {
+      "Path": "tests/Test-ForcedRemoval.ps1",
+      "Bytes": 8695,
+      "Sha256": "97A7CEFD20BC2C21A2A4CA914277FDFA9C40416B69FEE4E7E393266403444DF0"
+    },
+    {
+      "Path": "tests/Test-NativeDriverInventory.ps1",
+      "Bytes": 1143,
+      "Sha256": "D2C2B393247DDBBAAC7FF429BC15A6B595BD31C9E4E6F917E439DDEECB67BF7D"
+    },
+    {
+      "Path": "tests/Test-PublishedApp.ps1",
+      "Bytes": 5605,
+      "Sha256": "0357690BFF0473EC0DB61A733494282B728D40EA46BF759AA1C9F02A6B3DF35A"
+    },
+    {
+      "Path": "tests/Test-QueueDiscovery.ps1",
+      "Bytes": 7690,
+      "Sha256": "861AB860595D88BCD1DAB1AAB20EC4C413F7BE67305C8899694EE1DBD4E820EB"
+    },
+    {
+      "Path": "tests/Test-QueueIdentity.ps1",
+      "Bytes": 2453,
+      "Sha256": "70C63672D10CA128A398508D8E44CA6AF06C3BD11D553E4545FE7262A1CDBDFD"
+    },
+    {
+      "Path": "tests/Test-RemovalBackend.ps1",
+      "Bytes": 12801,
+      "Sha256": "9E0E7682A356695C92055B54CA374F55145788D70E55B09228DEC5A9440A50C7"
+    },
+    {
+      "Path": "tests/Test-SourceReturn.ps1",
+      "Bytes": 3010,
+      "Sha256": "8494157F335FAD1DE44ED687DF29DFEA9DCD0A91449312A1FA0E2F5660E61BB8"
+    },
+    {
+      "Path": "tests/manual/acceptance-template.json",
+      "Bytes": 2206,
+      "Sha256": "C81F3F20305E49948004E380232AC8B04B8B837966D01872F37D4DD0355E6A1D"
+    },
+    {
+      "Path": "tools/Estrai_Configurazione_Kyocera.cmd",
+      "Bytes": 130,
+      "Sha256": "141954CF743A935F6A680E91EEF0C255339B32EE129BAF5E5FBB01F4B573BDB1"
+    },
+    {
+      "Path": "tools/Estrai_Configurazione_Kyocera.ps1",
+      "Bytes": 2006,
+      "Sha256": "21055AA0979EE44D0FF8B8DC664C7F5E1BEA2EC082C7DC786B6925413E6ACF42"
+    },
+    {
+      "Path": "tools/Prepare-LocalKxLab.ps1",
+      "Bytes": 3924,
+      "Sha256": "D7C71141255BB5934EB963560CDD72491A15CC39092DA16D65602B5BBCE54722"
+    },
+    {
+      "Path": "tools/Prova_Sentinelle_KX.cmd",
+      "Bytes": 144,
+      "Sha256": "3ACFD4BAB8747ED2ECEE9BE629A6B1C177E768D36023C0526D818CA2E5882C84"
+    },
+    {
+      "Path": "tools/Prova_Sentinelle_KX.ps1",
+      "Bytes": 2093,
+      "Sha256": "CB485DF792259AF40CD96CBF250B7DAE8BCCDFA95B0DCCD65C744A4E149DFAD3"
+    },
+    {
+      "Path": "tools/Run-LocalKxProbe.ps1",
+      "Bytes": 3389,
+      "Sha256": "048306FDFBD682239DB501639D2429A323733BED703432E5DD24BB0607137A97"
+    },
+    {
+      "Path": "tools/Studia_Sentinella_Kyocera.cmd",
+      "Bytes": 142,
+      "Sha256": "4919D2CCA4D29E11A02C3B6874D8068F8E742C0B1B7B60F91529D10305FCAE10"
+    },
+    {
+      "Path": "tools/Use-GuideDriverInLocalLab.ps1",
+      "Bytes": 2997,
+      "Sha256": "4531BE3F64E6B96F7E8DDB59E6CC49524CB494A3CE6EA49501C6F2EA39CF269A"
+    },
+    {
+      "Path": "tools/Verifica_Campi_KX.cmd",
+      "Bytes": 118,
+      "Sha256": "C188B8408FF1CC4B695C1E7ACC3BE630CC2D7CF38F496A768B1B05FA3CE298E9"
+    },
+    {
+      "Path": "tools/Verifica_Campi_KX.ps1",
+      "Bytes": 5727,
+      "Sha256": "700800E7E57F070FDEB1BA501AB46BE3576463C94430E38C92C689A8405CECE8"
+    },
+    {
+      "Path": "tools/Verifica_Configurazione_Kyocera.cmd",
+      "Bytes": 162,
+      "Sha256": "66EBA126EAD7E302BA97ABF5A8AC0BBC133D98D7B6BE62C6AA08DB135E57ACA6"
+    },
+    {
+      "Path": "validation-evidence/0.2.7-rc1.json",
+      "Bytes": 1995,
+      "Sha256": "DAFB2CC65C46431722C61691286B880704CFECCF30AA9BE5A4D9BAE768F356DA"
+    },
+    {
+      "Path": "validation-evidence/publication-20261022.json",
+      "Bytes": 933,
+      "Sha256": "67CCE3014A2EB2786B997C26C5A4F3C71FE440D6F9A53C3C4EB96C4A8BC2C4F0"
+    }
+  ]
+}

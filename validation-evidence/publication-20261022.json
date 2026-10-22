@@ -1,0 +1,25 @@
+{
+  "PublicationDate": "2026-10-22",
+  "SourceVersion": "0.2.7-rc1",
+  "PublicSourceBuildSucceeded": true,
+  "BuildUsedExistingSdkAndPackageCache": true,
+  "DriverPayloadsVerifiedLocallyAndNotForPublication": true,
+  "LocalBuildInstallerSha256": "42F6F1D2D9A32A13259E04546CA3B4F9091B597B21F839924D0BE90517F56A3A",
+  "CoreChecks": 84,
+  "WindowsUiPrivacyChecks": 17,
+  "GuiDpiChecks": 122,
+  "OrdinaryRemovalSimulationChecks": 31,
+  "ForcedRemovalSimulationChecks": 16,
+  "PublishedExecutableSmokeChecks": 16,
+  "AuxiliaryBuilds": [
+    "Collector",
+    "Extractor",
+    "Readback",
+    "Sentinel"
+  ],
+  "AuxiliaryProgramsExecuted": false,
+  "PrinterInstallOrRemovalExecuted": false,
+  "PrintJobSubmitted": false,
+  "PrintersDefaultAndPortsPreservedBySmoke": true,
+  "Scope": "Fresh local build from the public source tree; driver archives only available locally and ignored by Git. Does not repeat native or physical validation."
+}

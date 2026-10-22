@@ -1,0 +1,59 @@
+<Window x:Class="Isafom.Collector.CollectorWindow"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ Title="Raccolta impostazioni Kyocera ISAFOM" Width="1020" Height="800"
+ MinWidth="640" MinHeight="420" WindowStartupLocation="Manual"
+ WindowStyle="SingleBorderWindow" ResizeMode="CanResize" WindowState="Normal"
+ Background="#F3F6FA" Foreground="#172B44" FontFamily="Segoe UI" FontSize="14">
+ <Window.Resources>
+  <Style TargetType="Button"><Setter Property="Padding" Value="16,10"/><Setter Property="Margin" Value="0,0,10,0"/><Setter Property="MinHeight" Value="42"/><Setter Property="Cursor" Value="Hand"/></Style>
+  <Style TargetType="DataGrid"><Setter Property="AutoGenerateColumns" Value="True"/><Setter Property="IsReadOnly" Value="True"/><Setter Property="CanUserAddRows" Value="False"/><Setter Property="CanUserDeleteRows" Value="False"/><Setter Property="GridLinesVisibility" Value="Horizontal"/><Setter Property="HeadersVisibility" Value="Column"/><Setter Property="RowHeaderWidth" Value="0"/><Setter Property="BorderBrush" Value="#D9E2ED"/><Setter Property="AlternatingRowBackground" Value="#F3F6FA"/></Style>
+ </Window.Resources>
+ <Border Padding="20,16" Background="#F3F6FA">
+ <ScrollViewer x:Name="LayoutViewport" SizeChanged="ViewportSizeChanged" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+ <Grid x:Name="LayoutGrid" MinHeight="520" Height="{Binding ViewportHeight, ElementName=LayoutViewport}" Background="#F3F6FA">
+  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+  <Grid>
+   <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+   <StackPanel Margin="0,0,12,0"><TextBlock Text="Raccolta impostazioni Kyocera" TextWrapping="Wrap" FontSize="27" FontWeight="SemiBold"/>
+    <TextBlock Text="PC di riferimento · CNR-ISAFOM Portici" Foreground="#566A82" Margin="0,6,0,0"/></StackPanel>
+   <Border Grid.Column="1" Background="#DFEEE8" CornerRadius="6" Padding="12,7" HorizontalAlignment="Right" VerticalAlignment="Top"><TextBlock Text="SOLA LETTURA" Foreground="#215C48" FontWeight="SemiBold" FontSize="12"/></Border>
+  </Grid>
+  <Border Grid.Row="1" Background="White" BorderBrush="#D9E2ED" BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,18,0,14">
+   <StackPanel>
+    <TextBlock Text="Sul PC dove la stampante funziona, apri questo tool con l'utente che la usa." FontWeight="SemiBold" TextWrapping="Wrap"/>
+    <TextBlock Text="1. Scegli la stampante funzionante.   2. Premi Raccogli impostazioni.   3. Esporta lo ZIP." Margin="0,7,0,0" TextWrapping="Wrap"/>
+    <TextBlock Text="Non occorrono codici o PIN. Il tool non cambia preferenze e non invia stampe. Non serve avviarlo come amministratore." Foreground="#566A82" Margin="0,7,0,0" TextWrapping="Wrap"/>
+   </StackPanel>
+  </Border>
+  <StackPanel Grid.Row="2">
+   <TextBlock Text="Stampante da analizzare — nome e driver visibili soltanto su questo PC" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,0,7"/>
+   <Grid Margin="0,0,0,6"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+    <ComboBox x:Name="QueuePicker" DisplayMemberPath="DisplayName" MinHeight="42" VerticalContentAlignment="Center" SelectionChanged="QueueSelectionChanged" Margin="0,0,10,0"/>
+    <Button x:Name="RefreshQueuesButton" Grid.Column="1" Content="Aggiorna elenco" Click="RefreshQueuesClick" Margin="0"/>
+   </Grid>
+   <TextBlock x:Name="QueueDetails" Text="L'elenco comprende tutte le stampanti disponibili, anche con nomi o driver differenti." Foreground="#566A82" TextWrapping="Wrap" MaxHeight="42" Margin="0,0,0,10"/>
+   <WrapPanel>
+   <Button x:Name="CaptureButton" IsEnabled="False" Content="Raccogli impostazioni" Click="CaptureClick" Background="#185E92" Foreground="White" BorderBrush="#185E92" FontWeight="SemiBold"/>
+   <Button x:Name="BaselineButton" Content="Usa lettura come riferimento" Click="BaselineClick" IsEnabled="False"/>
+   <Button x:Name="ExportButton" Content="Esporta ZIP…" Click="ExportClick" IsEnabled="False"/>
+   </WrapPanel>
+  </StackPanel>
+  <StackPanel Grid.Row="3" Margin="0,12,0,12">
+   <ProgressBar x:Name="ProgressBar" Height="4" IsIndeterminate="True" Visibility="Collapsed" Margin="0,0,0,8"/>
+   <TextBlock x:Name="Status" Text="Aggiorna l'elenco e scegli la stampante che usi normalmente." TextWrapping="Wrap"/>
+  </StackPanel>
+  <TabControl Grid.Row="4" MinHeight="150" Background="White" BorderBrush="#D9E2ED" Padding="12">
+   <TabItem Header="Risultati" Padding="12,8">
+    <TextBox x:Name="Summary" IsReadOnly="True" TextWrapping="Wrap" BorderThickness="0" Padding="7" VerticalScrollBarVisibility="Auto"
+     Text="La raccolta comprende driver, porta RAW/SNMP, preferenze globali e dell'utente, aree di registro mirate, dimensioni DEVMODE e campi PrintTicket consentiti.&#10;&#10;Per Job Accounting e stampa privata vengono raccolti gli indizi leggibili. I dati proprietari non decodificati saranno segnalati esplicitamente. La presenza della coda non dimostra che queste funzioni siano configurate.&#10;&#10;Una prima lettura è sufficiente per iniziare l'analisi. Ripetendo la raccolta nella stessa sessione potrai confrontarla con la prima: lo ZIP indicherà quali aree sono cambiate, senza includerne i dati riservati."/>
+   </TabItem>
+   <TabItem Header="Memorizzazione" Padding="12,8"><DataGrid x:Name="StorageGrid"/></TabItem>
+   <TabItem Header="Confronto" Padding="12,8"><DataGrid x:Name="ComparisonGrid"/></TabItem>
+   <TabItem Header="Log" Padding="12,8"><TextBox x:Name="LogText" IsReadOnly="True" BorderThickness="0" FontFamily="Consolas" FontSize="12" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/></TabItem>
+  </TabControl>
+  <TextBlock Grid.Row="5" Text="Assistenza informatica: Andrea Esposito — CNR-ISAFOM Portici · Raccolta 0.3.1-dev" Margin="0,14,0,0" Foreground="#566A82" FontSize="12" TextWrapping="Wrap"/>
+ </Grid>
+ </ScrollViewer>
+ </Border>
+</Window>

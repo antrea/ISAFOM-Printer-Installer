@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PlatformTarget>x64</PlatformTarget>
+    <SelfContained>false</SelfContained>
+    <UseAppHost>false</UseAppHost>
+    <Version>0.1.3-research</Version>
+  </PropertyGroup>
+  <ItemGroup><ProjectReference Include="../Isafom.Collector/Isafom.Collector.csproj" /></ItemGroup>
+  <ItemGroup><Compile Include="../../research/reverse-kx85/codec/Kx85PrivateCodeCodec.cs" Link="Research/Kx85PrivateCodeCodec.cs" /></ItemGroup>
+</Project>

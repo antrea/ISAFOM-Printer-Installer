@@ -273,10 +273,35 @@ public partial class MainWindow : Window
         {
             var settings=SelectedSettings();
             bool startForced=ReferenceEquals(sender,ForceUninstallButton);
+            if(startForced)
+            {
+                var selection=new SelectiveRemovalWindow(()=>SelectiveRemovalService.InventoryAsync(settings),
+                    ids=>SelectiveRemovalService.PreviewAsync(settings,ids)){Owner=this};
+                if(selection.ShowDialog()!=true || selection.ApprovedPlan is not { } approved)
+                {
+                    events.Record(Stage.RemovalCancelled);LogState.Text="ANNULLATO";
+                    SetStatus("Disinstallazione annullata","Nessuna rimozione eseguita.","success");return;
+                }
+                events.Record(Stage.Removing);LogState.Text="IN CORSO";
+                SetStatus("Rimozione selettiva in corso","Autorizza l'eventuale richiesta UAC per le code confermate.","working");
+                SelectiveQueueResult[] outcomes;
+                try {outcomes=await SelectiveRemovalService.RemoveAsync(settings,approved);}
+                catch(Exception error)
+                {
+                    string message=Messages.For(error is InstallerException known?known.Code:ErrorCode.MachineFailure);
+                    outcomes=approved.Queues.Select(q=>new SelectiveQueueResult(q.QueueId,q.Name,"Non rimossa",
+                        ["Assenza della coda e pulizia delle risorse non verificate"],[],message)).ToArray();
+                }
+                string details=string.Join("\n\n",outcomes.Select(o=>o.Description));
+                bool complete=outcomes.Length==approved.Queues.Length&&outcomes.All(o=>o.Complete);
+                personalChecks=null;previousSnapshot=currentSnapshot;currentSnapshot=null;
+                DebugSummary.Text=details;events.Record(Stage.RemovalFinished,complete?null:ErrorCode.Verification);
+                LogState.Text=complete?"COMPLETATO":"DA CONTROLLARE";
+                SetStatus(complete?"Rimozione selettiva verificata":"Rimozione selettiva da controllare",details,complete?"success":"error");
+                return;
+            }
             var normalPlan=await RemovalService.PreviewAsync(settings);
-            var forcedPlan=startForced||normalPlan.RequiresConfirmation||normalPlan.BlockedCode==ErrorCode.RemovalShared
-                ?await RemovalService.PreviewAsync(settings,forceRemoval:true):null;
-            var plan=startForced&&forcedPlan is not null?forcedPlan:normalPlan;
+            var plan=normalPlan;
             DebugSummary.Text=plan.Description;
             if(closeWhenIdle)return;
             if(!plan.HasWork&&plan.BlockedCode is null)
@@ -284,9 +309,9 @@ public partial class MainWindow : Window
                 events.Record(Stage.RemovalFinished);LogState.Text="GIÀ ASSENTE";
                 SetStatus("Nulla da rimuovere","Driver, code, porte e impostazioni ISAFOM risultano già assenti.","success");return;
             }
-            if(plan.RequiresConfirmation||(normalPlan.BlockedCode==ErrorCode.RemovalShared&&forcedPlan?.RequiresConfirmation==true))
+            if(plan.RequiresConfirmation)
             {
-                var dialog=new RemovalWindow(normalPlan,forcedPlan,startForced) {Owner=this};
+                var dialog=new RemovalWindow(normalPlan) {Owner=this};
                 if(dialog.ShowDialog()!=true)
                 {
                     events.Record(Stage.RemovalCancelled);LogState.Text="ANNULLATO";

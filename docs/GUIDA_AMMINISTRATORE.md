@@ -44,15 +44,15 @@ Una registrazione differente produce `DriverConflict`. Il programma non aggiorna
 
 ## Rimozione completa e forzata
 
-La modalità ordinaria lavora sulla stampante prevista e blocca dipendenze condivise. Quella forzata calcola la chiusura delle dipendenze fra registrazioni **Kyocera KX**, pacchetti OEM, file e code. Può coinvolgere altri modelli; anteprima e conferma mostrano l'ambito effettivo, comprese code condivise e predefinita.
+La modalità ordinaria lavora sulla stampante prevista e blocca dipendenze condivise. Quella forzata è **selettiva**: checkbox inizialmente vuote, inventario aggiornabile e conferma di un piano con le sole code selezionate. Le dipendenze condivise sono conservate e non estendono il piano ad altre code o modelli. Stampante predefinita, code condivise/remotamente connesse, stampanti di sistema e non pertinenti restano protette.
 
-Il piano include porte delle code coinvolte, anche WSD, e porte TCP/IP dell'endpoint ISAFOM rimaste senza coda. Una porta usata da una stampante esterna al gruppo blocca la rimozione. L'helper elevato ricalcola il piano e rifiuta una conferma divenuta obsoleta.
+Il GUID Windows `QueueInstanceId`, insieme alla configurazione, distingue ogni istanza anche in presenza di copie o nomi riutilizzati. Senza un'identità univoca l'applicazione protegge la voce. Le registrazioni incomplete identificabili vengono mostrate; il backend usa handle Winspool e un recupero limitato alla stessa istanza. L'helper elevato ricalcola il piano e rifiuta una conferma divenuta obsoleta.
 
-I lavori non sono cancellati. Lavori non enumerabili, risorse di altri produttori e dispositivi PnP esterni restano motivi di blocco. Solo i pacchetti verificati nel piano forzato ricevono `/force` da PnPUtil; non vengono usati `/uninstall` o `/reboot`.
+Si eliminano soltanto porte TCP/IP delle code selezionate riconducibili all'endpoint ISAFOM, inutilizzate e ancora identiche al piano. WSD, altre porte e porte orfane esterne alla selezione vengono conservate. I lavori non vengono cancellati; se presenti o non verificabili impediscono la rimozione della coda interessata. Il driver viene conservato quando usato da altre code; pacchetti e file richiedono anche controlli su registrazioni, dispositivi PnP, percorsi e hash noti. PnPUtil non riceve `/force`, `/uninstall` o `/reboot`.
 
-Il riavvio dello Spooler e la chiusura dei componenti dedicati sono ammessi solo dai controlli previsti e con code vuote. I file sono limitati da percorso canonico, hash e verifica dell'assenza di altri utilizzatori. Il sistema viene riletto alla fine: il tool non dichiara completo un risultato con residui.
+La rimozione selettiva non riavvia lo Spooler e non chiude componenti del driver. Un file bloccato resta un residuo esplicito. Ogni mutazione richiede una rilettura: l'esito positivo di un comando non prova l'assenza della risorsa. Il risultato individuale distingue rimozione completa, parziale e non verificata/non eseguita. Un errore su una coda non autorizza interventi su altre code non selezionate.
 
-La pulizia comprende le preferenze della sessione corrente e le risorse globali elencate; non attraversa tutti i profili Windows. Non equivale a una cancellazione forense della cronologia di Windows o di backup esterni.
+Il ripristino ordinario mantiene il proprio percorso di pulizia e la conferma per eventuali recuperi condizionati. La modalità selettiva conserva cache, configurazione generale del tool e cache delle preferenze nei profili utente; rimuovere una coda elimina i dati che Windows conserva nella coda stessa. Non si attraversano altri profili e non si promette una cancellazione forense della cronologia o dei backup.
 
 ## Log, segnalazioni e collaudo
 

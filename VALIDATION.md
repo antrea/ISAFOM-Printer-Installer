@@ -1,6 +1,16 @@
 # Validazione — 0.2.7-rc1
 
-## Risultati già registrati
+## Audit della revisione selettiva — 23 ottobre 2026
+
+Il codice attuale sostituisce la precedente espansione transitiva della rimozione forzata con la selezione esplicita delle istanze Windows. L'[evidenza filtrata](validation-evidence/selective-removal-20261023.json) riguarda questi sorgenti, compilati con SDK 10.0.402 senza archivi proprietari. Il manifest delle risorse identifica i file della revisione; gli hash degli EXE storici riportati sotto non identificano questa build di test.
+
+Eseguito `build/Test-SourceAudit.ps1`: compilazione senza avvisi/errori, 84 controlli Core, 17 Windows/UI/privacy, 53 installer (inclusi 10 controlli della selezione/conferma e del protocollo), 122 GUI/DPI e 17 identità/piattaforma. I 31 controlli di rimozione ordinaria e i **39 di rimozione selettiva** passano sia con PowerShell 7 sia con Windows PowerShell 5.1. L'inventario selettivo reale del backend incorporato è stato letto e confrontato senza cambiare code, porte, driver o predefinita.
+
+Le regressioni dimostrano, con mutatori Windows simulati, la rimozione di **due code su cinque** mantenendo identiche le altre tre e conservandone driver e porte. Coprono copie/identità duplicate, GUID mancanti o riutilizzo del nome, coda offline o incompleta, lavori sopraggiunti, cambio della predefinita, porte aggregate e riferimenti con diversa capitalizzazione, pacchetti/file condivisi con altri modelli, dispositivi PnP esterni, errori intermedi, permessi insufficienti, inventario corrotto, file bloccati, richiesta di riavvio, verifica dell'assenza e ripetizione senza ulteriori modifiche. L'interoperabilità nativa di recupero viene compilata senza chiamare API distruttive.
+
+Non sono stati installati/rimossi dispositivi reali né inviati lavori di stampa. Restano separati il collaudo nativo distruttivo in laboratorio e la build/pubblicazione con payload ufficiali, inclusi i relativi controlli di integrità/catalogo. `Build-Installer.ps1` conserva questi controlli e include ora la regressione dell'inventario selettivo reale.
+
+## Risultati storici dell'EXE 0.2.7-rc1 precedente alla revisione selettiva
 
 La [sintesi originale filtrata](validation-evidence/0.2.7-rc1.json) identifica l'EXE locale tramite SHA-256 **B139E8709863225961807A49024F5F54DE262C363A2ECDCF647227219325B7C1**. Il binario non è distribuito pubblicamente perché contiene driver Kyocera. Una compilazione locale può avere un hash diverso e deve essere verificata come tale.
 
@@ -22,7 +32,7 @@ La precedente **0.2.6-rc1**, hash **BB34BFF969D346EEE7FC1C4C451429471055D37D8B63
 
 ## Da completare sul campo
 
-- [ ] Rimozione forzata reale di un gruppo con driver condivisi, su un PC che presenta quella configurazione.
+- [ ] Rimozione selettiva reale di due code su cinque in un laboratorio con driver/porte condivisi, verificando le tre escluse e la predefinita.
 - [ ] Stampa e rilascio fisico con PIN.
 - [ ] Nome sul pannello e attribuzione contabile sul dispositivo.
 - [ ] Persistenza dopo riavvio e nuova sessione.

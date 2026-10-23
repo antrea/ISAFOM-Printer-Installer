@@ -14,8 +14,8 @@
     },
     {
       "Path": "BUILD.md",
-      "Bytes": 4226,
-      "Sha256": "69B662A7E4CE34E8DE8937D1C3BC40B325E07D20126887513052DA16C5D2419A"
+      "Bytes": 4843,
+      "Sha256": "9804B05A37B8F50CCEA54D69736C69FDE19FEC8EDB94DC63D38AF6D3A0496B06"
     },
     {
       "Path": "CONTRIBUTING.md",
@@ -29,8 +29,8 @@
     },
     {
       "Path": "FILELIST.md",
-      "Bytes": 1657,
-      "Sha256": "7AAA278CD2EE67FAB40ABC2FB628AF9544A610F815FF71D27EE5B682369AA490"
+      "Bytes": 1976,
+      "Sha256": "E46CB899DB7360627258EFFBE8F967E40AC14B0619323BC886D8ADFD5357E66B"
     },
     {
       "Path": "LICENSE.md",
@@ -44,8 +44,8 @@
     },
     {
       "Path": "README.md",
-      "Bytes": 4134,
-      "Sha256": "7233F6D4BE535B8D3852757D9616FA7D55B5F96C033CD994F6BEB9F85C9A5B3F"
+      "Bytes": 4241,
+      "Sha256": "4D79D326635D2F96D7EC254064A9D6653110162385FA78740489C878E416F5F2"
     },
     {
       "Path": "SECURITY.md",
@@ -59,13 +59,13 @@
     },
     {
       "Path": "VALIDATION.md",
-      "Bytes": 3666,
-      "Sha256": "575E0FAAEEE390823F26164AFBB060C9BF5752E87C46DF1EAFB0CBF8A4DE34CE"
+      "Bytes": 5789,
+      "Sha256": "8B5760FB6FA22181F14BAB0063382C684943D834F36794B64B2AE022FB6102E8"
     },
     {
       "Path": "build/Build-Installer.ps1",
-      "Bytes": 3343,
-      "Sha256": "35B5C83E607AA123EA2DD852410AD7C2060536B092AB82C4BF6B9077F0E5A433"
+      "Bytes": 3512,
+      "Sha256": "2DEB0C9BB0CC5991EF5E5D11691A0608C97470A2C500BB8B44DBE89E73C2571E"
     },
     {
       "Path": "build/Build-Tools.ps1",
@@ -103,6 +103,11 @@
       "Sha256": "D4E6406693637D00319939342BF06D8EB09ECEC359C47507BEDD7FEAEF0CC80C"
     },
     {
+      "Path": "build/Test-SourceAudit.ps1",
+      "Bytes": 3053,
+      "Sha256": "EFD6346D4B1AEC92B84AF04D30A973244CBC34737A84E1D3AE292DCC9F0951AE"
+    },
+    {
       "Path": "config/printer-settings.json",
       "Bytes": 533,
       "Sha256": "306CD01F97BE21FED084FD6814CF3B7BEABD394B4CA17D587F113E9054E4E99C"
@@ -119,8 +124,8 @@
     },
     {
       "Path": "docs/ARCHITETTURA.md",
-      "Bytes": 2892,
-      "Sha256": "0A6AF7645B381FA640C364CCA5DC2613F3B69E9302DD72BA8D40F44498B98217"
+      "Bytes": 3844,
+      "Sha256": "A6CCCE07CA55E1F7EE8E4E4A46A81F4BAAD1DBDEFE9E806BED632E63C4192B41"
     },
     {
       "Path": "docs/DIAGNOSTICA.md",
@@ -129,18 +134,18 @@
     },
     {
       "Path": "docs/GUIDA_AMMINISTRATORE.md",
-      "Bytes": 4937,
-      "Sha256": "F6039E13877250905D2F9F619E5DEEB64CD6B0CC4D116CD37BC4A603C88ACB1B"
+      "Bytes": 5765,
+      "Sha256": "0862BC1C4186BE8FCBD2F16B959639AA9E91B99AF6E97CE590AF8D05D026CDFE"
     },
     {
       "Path": "docs/GUIDA_UTENTE.md",
-      "Bytes": 4358,
-      "Sha256": "A8A93C37A346F92940163E6C4B7A3894640E1D81A7C5837F2B5712AB6D2B973A"
+      "Bytes": 5078,
+      "Sha256": "88A07CF689DBAD4FBF2D14DB2C8057F0C5C99A342EB9ACAD9343E67FDF2385DC"
     },
     {
       "Path": "docs/INSTALLER_027_RC1.md",
-      "Bytes": 3418,
-      "Sha256": "5B86E951E6ADFF0C1EA3332F73A71AB11C8C26D43C3A0B60A3ABB256E9E92612"
+      "Bytes": 2809,
+      "Sha256": "D5D371F68DF9E0B1B95A01C71DE0669F091C340365C408DC0A136E01A6DEB824"
     },
     {
       "Path": "docs/images/installazione.png",
@@ -474,8 +479,8 @@
     },
     {
       "Path": "src/Isafom.Windows/Isafom.Windows.csproj",
-      "Bytes": 2580,
-      "Sha256": "33B5751980168A583312FABBEE220501FBCD6D84896B9C75766A759F5E757D40"
+      "Bytes": 2644,
+      "Sha256": "77D98E1F1CB5CB2A5A4ADF203F331A9DE11FE284A54B604043D7D4E866985D4C"
     },
     {
       "Path": "src/Isafom.Windows/Kx85Preferences.cs",
@@ -484,13 +489,13 @@
     },
     {
       "Path": "src/Isafom.Windows/MainWindow.xaml",
-      "Bytes": 29317,
-      "Sha256": "14D7904C37FC96AEDD676B2BA49D3E92B6FB8D80B2465CEA7FE51517E2BB16EE"
+      "Bytes": 29309,
+      "Sha256": "A1E26A7C9DABE472507446AAACAC2C17E1332DBFFA1BCC69DF42C8F1E70BD2C7"
     },
     {
       "Path": "src/Isafom.Windows/MainWindow.xaml.cs",
-      "Bytes": 19095,
-      "Sha256": "0F2EF9693A9E16CF4D2A44E0BB31BBD62F83D88DEACA7027B53C3C55A313D99C"
+      "Bytes": 20701,
+      "Sha256": "E0FFBF2075CC774770F142E7071DD452194BBEB5E26290808245F87B0E9AF991"
     },
     {
       "Path": "src/Isafom.Windows/NativeColor.cs",
@@ -504,13 +509,13 @@
     },
     {
       "Path": "src/Isafom.Windows/Program.cs",
-      "Bytes": 7973,
-      "Sha256": "892B6817FDC13DC8F85F3BE31E8E42212037DFFEE7B9E8430D828798AA91FE49"
+      "Bytes": 8264,
+      "Sha256": "F168E3B09B03BCDFD70E4BD0AD1DD9C53FE8145EEB66B8E22F2CEACB8E4795D6"
     },
     {
       "Path": "src/Isafom.Windows/Removal.cs",
-      "Bytes": 11554,
-      "Sha256": "B5F8676C3F2363327F73D84067AED25E0A8D92E39B443E1E78E52610783E734F"
+      "Bytes": 10207,
+      "Sha256": "8EA79DE1CDB0BC47AB79D0C69E2518F8D60611DF97EC8FA8023D43E278F6A20F"
     },
     {
       "Path": "src/Isafom.Windows/RemovalStorage.cs",
@@ -524,18 +529,28 @@
     },
     {
       "Path": "src/Isafom.Windows/Scripts/PrinterBackend.ps1",
-      "Bytes": 14141,
-      "Sha256": "483BF0BC5FC63F97A58FAA41F2D632D2D7F526EB630B249163867B862DDB8F98"
+      "Bytes": 14904,
+      "Sha256": "29CD0DF4720622840CE108294AFDC3B33496E779D55F9D88C8713A4AB19CA5D6"
     },
     {
       "Path": "src/Isafom.Windows/Scripts/RemovalBackend.ps1",
-      "Bytes": 28805,
-      "Sha256": "3AD9835CF4D6F4E9258C844162D32268276B82B84D50ED3D939F6CA104F3270D"
+      "Bytes": 26524,
+      "Sha256": "7DEF5675E6CC2FC7EAB27FC11C0E326278EE74487C15EECC0F4FE380B0BA55CE"
+    },
+    {
+      "Path": "src/Isafom.Windows/Scripts/SelectiveRemoval.ps1",
+      "Bytes": 27052,
+      "Sha256": "DC025FCE15DE2BF23BC1FFE75D30864F0C578EECE773178EE44CF488352AB54E"
+    },
+    {
+      "Path": "src/Isafom.Windows/SelectiveRemoval.cs",
+      "Bytes": 10310,
+      "Sha256": "776DEA3AFA2CCFB156F519E53CA2E9DFBF6B3125546A22249AC4D37E7D821711"
     },
     {
       "Path": "src/Isafom.Windows/WindowsServices.cs",
-      "Bytes": 29882,
-      "Sha256": "49A705C8060C9B673C6B7327AA160ECFAC381EA20227775797712731665DBBCF"
+      "Bytes": 31645,
+      "Sha256": "2225CD73E283D94749358A56FDDD64B575CA794659BB394B5AE121BB784D82B1"
     },
     {
       "Path": "src/Isafom.Windows/app.manifest",
@@ -564,8 +579,8 @@
     },
     {
       "Path": "tests/Isafom.Installer.Tests/GuiChecks.cs",
-      "Bytes": 14876,
-      "Sha256": "8A0D7CCAC5589AFA8D96322AD54E99A86AA84EB3A97424B1DBC9375DFC8BE869"
+      "Bytes": 14352,
+      "Sha256": "9BA781081EE7A2579C40121698123FA60FFC5D1E961BE7387F205D845372D257"
     },
     {
       "Path": "tests/Isafom.Installer.Tests/Isafom.Installer.Tests.csproj",
@@ -574,8 +589,13 @@
     },
     {
       "Path": "tests/Isafom.Installer.Tests/Program.cs",
-      "Bytes": 20385,
-      "Sha256": "EF6FB5E20EA2C734380F5A71ADC888C294B9E462BCD38E4A9C18BE7F6F4A766C"
+      "Bytes": 19741,
+      "Sha256": "C02FCEBC83BFC0088432C75D5F8BB6C3FECBA66F93E7A09EE7DDCFB730963FA0"
+    },
+    {
+      "Path": "tests/Isafom.Installer.Tests/SelectiveRemovalChecks.cs",
+      "Bytes": 5915,
+      "Sha256": "A060AFD568E65D9737841CB1649232A14F56BE938450DE469CB3C2D296140315"
     },
     {
       "Path": "tests/Isafom.KxReadback.Tests/Isafom.KxReadback.Tests.csproj",
@@ -639,8 +659,8 @@
     },
     {
       "Path": "tests/Test-ForcedRemoval.ps1",
-      "Bytes": 8695,
-      "Sha256": "97A7CEFD20BC2C21A2A4CA914277FDFA9C40416B69FEE4E7E393266403444DF0"
+      "Bytes": 19135,
+      "Sha256": "C91DD5B84EA299D10C28A45819B088C24DC00DC09D6E6D5BE5592A68D6C7EF7C"
     },
     {
       "Path": "tests/Test-NativeDriverInventory.ps1",
@@ -649,8 +669,8 @@
     },
     {
       "Path": "tests/Test-PublishedApp.ps1",
-      "Bytes": 5605,
-      "Sha256": "0357690BFF0473EC0DB61A733494282B728D40EA46BF759AA1C9F02A6B3DF35A"
+      "Bytes": 5617,
+      "Sha256": "3C323A58E0E6E7B41551F8DA9F4C8B558448E5186B8041BEB658F94CB6132C57"
     },
     {
       "Path": "tests/Test-QueueDiscovery.ps1",
@@ -741,6 +761,11 @@
       "Path": "validation-evidence/publication-20261022.json",
       "Bytes": 933,
       "Sha256": "67CCE3014A2EB2786B997C26C5A4F3C71FE440D6F9A53C3C4EB96C4A8BC2C4F0"
+    },
+    {
+      "Path": "validation-evidence/selective-removal-20261023.json",
+      "Bytes": 1545,
+      "Sha256": "46472AA967336FFB86D677B770F8A997E4F9C85F35DA564131EAC43E73659724"
     }
   ]
 }

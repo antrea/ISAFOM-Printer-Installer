@@ -37,6 +37,8 @@ if(-not $SkipTests){
   if($project -eq 'Isafom.Installer.Tests') {
    & $sdk (Join-Path $artifacts ('bin\'+$project+'\'+$framework+'\'+$project+'.dll')) --gui (Join-Path $work 'gui-checks')
    if($LASTEXITCODE -ne 0){throw 'GuiDpiTestsFailed'}
+   & $sdk (Join-Path $artifacts ('bin\'+$project+'\'+$framework+'\'+$project+'.dll')) --selective-live
+   if($LASTEXITCODE -ne 0){throw 'SelectiveInventoryTestsFailed'}
   }
  }
 }

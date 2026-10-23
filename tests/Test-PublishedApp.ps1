@@ -41,9 +41,9 @@ try {
     $removalPlan=Get-Content -LiteralPath $removal -Raw|ConvertFrom-Json
     Check ($removalPlan.Fingerprint -match '^[A-F0-9]{64}$' -and $null -eq $removalPlan.PSObject.Properties['AccountID']) 'Removal preview has a bounded confirmation fingerprint and no personal codes'
     $forcePreview=Join-Path $output 'force-removal-preview.json'
-    Check ((Run-App @('--force-removal-preview-output',$forcePreview)) -eq 0) 'Published EXE computes expanded force preview without elevation or mutations'
-    $forcePlan=Get-Content -LiteralPath $forcePreview -Raw|ConvertFrom-Json
-    Check ($forcePlan.ForceRemoval -and $forcePlan.Fingerprint -match '^[A-F0-9]{64}$' -and $null -eq $forcePlan.PSObject.Properties['AccountID']) 'Force preview binds its expanded scope and omits personal codes'
+    Check ((Run-App @('--force-removal-preview-output',$forcePreview)) -eq 0) 'Published EXE reads selective force inventory without elevation or mutations'
+    $forcePlan=@(Get-Content -LiteralPath $forcePreview -Raw|ConvertFrom-Json)
+    Check (@($forcePlan|Where-Object {$null -ne $_.PSObject.Properties['AccountID'] -or $null -eq $_.PSObject.Properties['CanSelect']}).Count -eq 0) 'Force inventory exposes protection without selection or personal codes'
     $settings = Get-Content -LiteralPath (Join-Path $root 'config\printer-settings.json') -Raw
     Check ((Run-App @('--validate-config-stdin') $settings) -eq 0) 'Administrative settings validated in memory through stdin'
     Check ((Run-App @('--validate-config',(Join-Path $root 'config\printer-settings.json'))) -eq 0) 'Configuration validation file mode is read-only'

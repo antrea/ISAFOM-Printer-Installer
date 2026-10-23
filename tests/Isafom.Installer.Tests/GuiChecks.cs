@@ -138,17 +138,15 @@ internal static class GuiChecks
             var confirmationPng=new PngBitmapEncoder();confirmationPng.Frames.Add(BitmapFrame.Create(confirmationBitmap));
             using(var confirmationFile=File.Create(Path.Combine(output,"Disinstallazione_Anteprima_025.png")))confirmationPng.Save(confirmationFile);
             confirmation.Close();
-            var expanded=removalPlan with {ForceRemoval=true,DriverVersion="8.2.623.0",DriverRegistrations=[
-                new("Kyocera TASKalfa 3554ci KX","Windows x64"),new("Kyocera TASKalfa 5052ci KX","Windows x64"),new("Kyocera TASKalfa 4052ci KX","Windows x64")],
-                QueuesToRemove=[new("Kyocera reparto A","Kyocera TASKalfa 5052ci KX","IP_Reparto_A",0,true,false),new("Kyocera reparto B","Kyocera TASKalfa 4052ci KX","WSD_Reparto_B",0,false,false)],
-                PortsToRemove=[new("stampante.isafom.cnr.it","140.164.75.11",1,9100),new("IP_Reparto_A","192.0.2.10",1,9100),new("WSD_Reparto_B","",0,0,"WSD Port Monitor")]};
-            var forceConfirmation=new RemovalWindow(removalPlan with {CanProceed=false,BlockedCode=ErrorCode.RemovalShared},expanded,true);
+            var forceConfirmation=new SelectiveRemovalWindow(()=>Task.FromResult(SelectiveRemovalChecks.Inventory),
+                ids=>Task.FromResult(SelectiveRemovalChecks.Plan(ids)));
+            forceConfirmation.SetInventory(SelectiveRemovalChecks.Inventory);
             var forceRoot=(FrameworkElement)forceConfirmation.Content;forceConfirmation.Content=null;
             System.Windows.Documents.TextElement.SetFontFamily(forceRoot,forceConfirmation.FontFamily);
             System.Windows.Documents.TextElement.SetFontSize(forceRoot,forceConfirmation.FontSize);
             ((Panel)forceRoot).Background=forceConfirmation.Background;
             forceRoot.Measure(new(660,620));forceRoot.Arrange(new Rect(0,0,660,620));forceRoot.UpdateLayout();
-            Check(Unclipped(forceConfirmation.RemoveButton,forceRoot)&&forceConfirmation.ForceChoice.IsChecked==true,"Expanded force confirmation keeps its selected mode and action visible");
+            Check(Unclipped(forceConfirmation.RemoveButton,forceRoot)&&!forceConfirmation.RemoveButton.IsEnabled,"Selective force actions remain visible and require explicit selection");
             var forceBitmap=new RenderTargetBitmap(660,620,96,96,PixelFormats.Pbgra32);forceBitmap.Render(forceRoot);
             var forcePng=new PngBitmapEncoder();forcePng.Frames.Add(BitmapFrame.Create(forceBitmap));
             using(var forceFile=File.Create(Path.Combine(output,"Disinstallazione_Forzata_027.png")))forcePng.Save(forceFile);

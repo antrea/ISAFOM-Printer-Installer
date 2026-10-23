@@ -31,7 +31,9 @@ Per il collaudo fisico, concordare una stampa con l'amministratore: controllare 
 
 La scheda **Debug e verifica** mostra informazioni tecniche, versione selezionata, diagnostica e comandi di rimozione. La versione proposta all'avvio è **8.5.2405**; l'amministratore può selezionare **8.7.0917** per la sessione corrente.
 
-**Rimuovi completamente…** presenta gli elementi della stampante da eliminare. Se sono condivisi con altri modelli, il piano può essere bloccato. **Rimozione forzata…** estende il piano ai modelli e alle code Kyocera KX collegati: può quindi eliminare anche altre stampanti elencate. Farlo solo dopo aver letto l'intero elenco e concordato l'intervento con l'amministratore.
+**Rimuovi completamente…** presenta gli elementi della stampante da eliminare. Se sono condivisi con altri modelli, il piano può essere bloccato. **Rimozione forzata selettiva…** mostra le code ISAFOM, comprese copie e installazioni incomplete. Ogni voce indica nome, driver, porta, IP/host e stato. Nessuna voce è selezionata all'apertura; **Aggiorna elenco** rilegge il PC e azzera la selezione. È possibile mostrare anche le altre stampanti, che restano protette insieme a quelle predefinite, condivise, remote o con identità non verificabile.
+
+Seleziona soltanto le code desiderate, premi **Controlla selezione…**, leggi il riepilogo e spunta la conferma esplicita prima di **Rimuovi le code confermate**. Le code escluse restano fuori dall'intervento. Driver, pacchetti, porte e file condivisi vengono conservati. La rimozione selettiva funziona anche senza raggiungere la stampante in rete e mostra un esito per ogni coda: rimossa completamente, parzialmente oppure non rimossa, con eventuali residui. La pulizia selettiva conserva la configurazione e la cache generali del programma.
 
 Non vengono cancellati i lavori pendenti. Lavori presenti o non leggibili e dipendenze esterne impediscono la rimozione. Se restano file, pacchetti o porte, il risultato viene indicato come incompleto. Se è tutto assente, compare **Nulla da rimuovere**, senza UAC.
 

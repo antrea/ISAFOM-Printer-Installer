@@ -239,34 +239,9 @@ function Get-IsafomExtraPortFacts([string[]]$Names){
     }
 }
 
-function Get-IsafomForcedScope($s,$AllDrivers,$Seed){
-    $selected=@($AllDrivers|Where-Object {$d=$_;@($Seed.Registrations|Where-Object {$_.Name -ceq $d.Name -and $_.Environment -ceq $d.PrinterEnvironment}).Count -gt 0})
-    $unresolved=$Seed.Unresolved;$packages=@($Seed.Packages)
-    for($iteration=0;$iteration -lt 128;$iteration++){
-        $registrations=@($selected|Sort-Object Name,PrinterEnvironment|ForEach-Object {[pscustomobject]@{Name=$_.Name;Environment=$_.PrinterEnvironment}})
-        $facts=Get-IsafomRemovalFileFacts $AllDrivers $registrations
-        $selectedNames=@($selected|ForEach-Object Name)
-        $add=@($AllDrivers|Where-Object {
-            $d=$_
-            if(@($registrations|Where-Object {$_.Name -ceq $d.Name -and $_.Environment -ceq $d.PrinterEnvironment}).Count){return $false}
-            if($d.Name -notmatch '^Kyocera .+ KX$'){return $false}
-            if($d.Name -cin $selectedNames){return $true}
-            $references=@(Get-IsafomDriverPaths @($d))
-            @($facts.Files|Where-Object {$_.Path -iin $references}).Count -gt 0
-        })
-        if($add.Count -eq 0){
-            return [pscustomobject]@{Packages=$packages;Registrations=$registrations;DriverNames=@($selectedNames|Sort-Object -Unique);Unresolved=$unresolved;FileFacts=$facts}
-        }
-        $selected+=@($add)
-        if($selected.Count -gt 128){throw 'RemovalBlocked'}
-        $extra=Get-IsafomPackagesForDrivers $selected
-        $packages=@(@($packages)+@($extra.Packages)|Sort-Object Name -Unique)
-        $unresolved=$unresolved -or $extra.Unresolved
-    }
-    throw 'RemovalBlocked'
-}
-
 function Get-IsafomRemovalPlan {param($s,[string]$OwnerSid,[bool]$ForceRemoval=$false)
+    # The former transitive force scope is no longer an authorized entry point.
+    if($ForceRemoval){throw 'Protocol'}
     $state=Get-IsafomSnapshot $s $OwnerSid
     if(-not $state.SpoolerRunning){throw 'SpoolerUnavailable'}
     $all=@(Get-Printer);$allDrivers=@(Get-PrinterDriver)
@@ -276,11 +251,11 @@ function Get-IsafomRemovalPlan {param($s,[string]$OwnerSid,[bool]$ForceRemoval=$
             @($state.Ports|Where-Object { $_.Name -ceq $q.PortName -and (Test-IsafomTarget $s $_.Host) }).Count -gt 0)
     })
     $blocked=$null;$queue=$null;$manual=$false;$jobs=0;$isDefault=$false;$portName=$null
-    if($candidates.Count -gt 1 -and -not $ForceRemoval){$blocked='AmbiguousQueue'}
+    if($candidates.Count -gt 1){$blocked='AmbiguousQueue'}
     if($candidates.Count -eq 1){
         $q=$candidates[0];$queue=$q.Name
         $ports=@($state.Ports|Where-Object { $_.Name -ceq $q.PortName -and (Test-IsafomTarget $s $_.Host) -and $_.Protocol -eq 1 -and $_.PortNumber -eq $s.PortNumber })
-        if(($q.Shared -and -not $ForceRemoval) -or $q.Type.ToString() -ne 'Local' -or $q.DriverName -cne $s.DriverName -or ($ports.Count -ne 1 -and -not $ForceRemoval)){$blocked='QueueConflict'}
+        if(($q.Shared) -or $q.Type.ToString() -ne 'Local' -or $q.DriverName -cne $s.DriverName -or ($ports.Count -ne 1)){$blocked='QueueConflict'}
         else{$portName=$q.PortName}
         $managed=Test-IsafomManagedQueue $q.Name $q.Comment (Get-IsafomOwnerMarker $OwnerSid)
         $manual=-not $managed
@@ -307,11 +282,10 @@ function Get-IsafomRemovalPlan {param($s,[string]$OwnerSid,[bool]$ForceRemoval=$
         }
     }
     $package=Get-IsafomPackageFacts $s $allDrivers
-    if($ForceRemoval){$package=Get-IsafomForcedScope $s $allDrivers $package;$fileFacts=$package.FileFacts}
-    else{$fileFacts=Get-IsafomRemovalFileFacts $allDrivers $package.Registrations}
+    $fileFacts=Get-IsafomRemovalFileFacts $allDrivers $package.Registrations
     if($package.Unresolved){$blocked='RemovalBlocked'}
     $modelNames=@($package.DriverNames)
-    $removeQueues=@($all|Where-Object {$_.Name -ceq $queue -or ($ForceRemoval -and $_.DriverName -cin $modelNames)}|Sort-Object Name)
+    $removeQueues=@($all|Where-Object {$_.Name -ceq $queue}|Sort-Object Name)
     $queueFacts=@(foreach($q in $removeQueues){
         $count=0;try{$count=@(Get-PrintJob -PrinterName $q.Name).Count}catch{$count=-1}
         if($q.Type.ToString() -ne 'Local'){$blocked='QueueConflict'}
@@ -326,14 +300,9 @@ function Get-IsafomRemovalPlan {param($s,[string]$OwnerSid,[bool]$ForceRemoval=$
     $driverUsers+=@(Get-IsafomBoundDevices $package.Packages $removeNames|ForEach-Object {'Dispositivo: '+$_})
     $driverUsers+=@($fileFacts.SharedBy)
     $queuePorts=@($queueFacts|ForEach-Object PortName)
-    $removePorts=@($state.Ports|Where-Object {$_.Name -ceq $portName -or (Test-IsafomTarget $s $_.Host) -or ($ForceRemoval -and $_.Name -cin $queuePorts)}|Sort-Object Name|ForEach-Object {
+    $removePorts=@($state.Ports|Where-Object {$_.Name -ceq $portName -or (Test-IsafomTarget $s $_.Host)}|Sort-Object Name|ForEach-Object {
         [pscustomobject]@{Name=$_.Name;Host=$_.Host;Protocol=[int]$_.Protocol;PortNumber=[int]$_.PortNumber}
     })
-    if($ForceRemoval){
-        $tcpNames=@($removePorts|ForEach-Object Name)
-        $otherNames=@($queuePorts|Where-Object {$_ -cnotin $tcpNames}|Sort-Object -Unique)
-        if($otherNames.Count){$removePorts+=@(Get-IsafomExtraPortFacts $otherNames)}
-    }
     $removePorts=@($removePorts|Sort-Object Name -Unique)
     $portNames=@($removePorts|ForEach-Object Name)
     $portUsers=@($all|Where-Object {$_.PortName -cin $portNames -and $_.Name -cnotin $removeNames}|Sort-Object Name|ForEach-Object {$_.Name})
@@ -365,10 +334,8 @@ function Remove-IsafomOemPackage {param($package,[bool]$ForceRemoval=$false)
     $file=Join-Path (Join-Path $env:WINDIR 'INF') $package.Name
     if(-not (Test-Path -LiteralPath $file)){return [pscustomobject]@{Removed=$true;RestartRequired=$false}}
     if((Get-IsafomFileHash $file) -cne $package.Sha256){throw 'RemovalChanged'}
-    # /force is limited to the reviewed closure after all queues/driver users
-    # and PnP dependencies were rechecked. Never /uninstall or /reboot devices.
-    if($ForceRemoval){$null=& (Join-Path $env:WINDIR 'System32\pnputil.exe') /delete-driver $package.Name /force}
-    else{$null=& (Join-Path $env:WINDIR 'System32\pnputil.exe') /delete-driver $package.Name}
+    if($ForceRemoval){throw 'Protocol'}
+    $null=& (Join-Path $env:WINDIR 'System32\pnputil.exe') /delete-driver $package.Name
     $exitCode=$LASTEXITCODE
     [pscustomobject]@{Removed=($exitCode -eq 0 -and -not (Test-Path -LiteralPath $file));RestartRequired=($exitCode -eq 3010)}
 }

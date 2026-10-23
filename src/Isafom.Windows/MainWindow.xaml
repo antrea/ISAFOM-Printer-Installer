@@ -388,7 +388,7 @@
                 <Button x:Name="CompareButton" Content="Confronta acquisizioni" Click="CompareClick" Margin="0,0,8,12" />
                 <Button x:Name="ExportButton" Content="Esporta report…" Click="ExportClick" Margin="0,0,8,12" />
                 <Button x:Name="UninstallButton" Content="Rimuovi completamente…" Click="UninstallClick" Background="#B52F2F" BorderBrush="#B52F2F" Foreground="White" Margin="0,0,8,12" ToolTip="Rimuove coda, preferenze, porte, driver, pacchetti e cache. Se il driver è assente, pulisce i residui senza un'ulteriore conferma." />
-                <Button x:Name="ForceUninstallButton" Content="Rimozione forzata…" Click="UninstallClick" Background="#FFF0F0" BorderBrush="#B52F2F" Foreground="#A52A2A" Margin="0,0,0,12" ToolTip="Include gli altri driver e le code Kyocera collegati ai file condivisi e tutte le porte coinvolte. Mostra l'elenco completo prima della conferma." />
+                <Button x:Name="ForceUninstallButton" Content="Rimozione forzata selettiva…" Click="UninstallClick" Background="#FFF0F0" BorderBrush="#B52F2F" Foreground="#A52A2A" Margin="0,0,0,12" ToolTip="Aggiorna l'inventario e seleziona esplicitamente le sole code ISAFOM da rimuovere. Driver e porte condivisi vengono conservati." />
               </WrapPanel>
               <TextBox x:Name="DebugSummary" Grid.Row="3" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Top" FontSize="13" Padding="16,12" Background="White" BorderBrush="#D7E3EC" Text="Premi Rileggi configurazione per acquisire lo stato attuale." />
               <TextBlock Grid.Row="4" Text="Log tecnico · nessun dato personale" FontWeight="SemiBold" Margin="0,16,0,8" FontSize="13" />

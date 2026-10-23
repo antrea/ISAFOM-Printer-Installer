@@ -27,6 +27,14 @@ Il programma è pubblicato autonomo, x64, in singolo file, con entrambi i payloa
 
 ## Verifica dell'EXE appena costruito
 
+Per l'audit dei soli sorgenti pubblici, anche senza archivi Kyocera:
+
+```powershell
+.\build\Test-SourceAudit.ps1
+```
+
+Esegue Core, Windows/UI/privacy, installer, GUI/DPI e rimozioni simulate con PowerShell 7 e Windows PowerShell 5.1, più l'inventario selettivo reale in sola lettura. Gli output sono in `.lavoro-source-audit`; sono assemblati per test senza payload proprietari e il relativo target vieta la pubblicazione. I controlli di integrità/catalogo dei payload e la creazione dell'EXE completo richiedono la procedura precedente. È disponibile il parametro `-Dotnet` per un SDK installato fuori dal PATH.
+
 ```powershell
 .\tests\Test-PublishedApp.ps1
 Get-FileHash .\dist\installer-0.2.7-rc1\Installa_Stampante_ISAFOM.exe -Algorithm SHA256

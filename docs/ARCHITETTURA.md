@@ -20,9 +20,11 @@ La comunicazione con i processi di lavoro usa canali privati; Nome e Account ID 
 
 ## Rimozione
 
-`Removal.cs` e `RemovalStorage.cs` gestiscono piano, presentazione e conferma. `Scripts/RemovalBackend.ps1` produce e ricontrolla l'inventario; `DriverLocks.cs.txt` fornisce controlli nativi su file e utilizzatori. Il nome risorsa e `WithCulture=false` di questo file nel progetto sono intenzionali.
+`Removal.cs` e `RemovalStorage.cs` gestiscono il ripristino ordinario. `SelectiveRemoval.cs` e `Scripts/SelectiveRemoval.ps1` implementano la rimozione forzata selettiva: inventario aggiornabile, checkbox vuote, riepilogo separato e conferma esplicita. `DriverLocks.cs.txt` fornisce controlli nativi su file e utilizzatori. Il nome risorsa e `WithCulture=false` di questo file nel progetto sono intenzionali.
 
-Il piano forzato estende transitivamente le dipendenze solo ai modelli Kyocera KX ammissibili. L'impronta confermata è ricontrollata dal processo elevato. Le operazioni sono limitate alle risorse elencate, con controlli su lavori, dipendenze esterne, percorsi e hash e una rilettura finale. Le prove della chiusura delle dipendenze sono in `tests/Test-ForcedRemoval.ps1`.
+Il piano selettivo contiene soltanto i GUID `QueueInstanceId` scelti dall'utente. L'helper autenticato ricostruisce e confronta l'impronta del piano; un handle Winspool identifica la singola istanza durante la cancellazione. Nome, GUID, driver, porta, commento, lavori e protezioni sono ricontrollati. Identità ambigue o mancanti, code predefinite, condivise, remote, di sistema e non pertinenti sono protette. Le registrazioni incomplete ancora identificabili nel registro vengono mostrate e possono ricevere un tentativo nativo mirato.
+
+Le dipendenze riducono le risorse rimovibili: non aggiungono mai altre code o altri modelli al piano. Porte dedicate, registrazioni, pacchetti INF riconosciuti e file con hash noti vengono rimossi solo dopo nuove verifiche degli utilizzatori; risorse condivise o non verificabili rimangono. Non sono previsti reset dello spooler, chiusure di processi, cancellazioni di lavori, `/force`, recuperi globali dei file o pulizia della configurazione/cache del tool nel percorso selettivo. Ogni coda riceve un esito verificato con residui e risorse conservate. Le regressioni, incluso il caso due code su cinque, sono in `tests/Test-ForcedRemoval.ps1` e `SelectiveRemovalChecks.cs`.
 
 ## Verifiche e limiti
 

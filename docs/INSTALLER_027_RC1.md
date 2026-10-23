@@ -1,20 +1,20 @@
-# Installer 0.2.7-rc1 — rimozione forzata e porte
+# Installer 0.2.7-rc1 — revisione dei sorgenti: rimozione forzata selettiva
 
-In **Debug e verifica** sono disponibili **Rimuovi completamente…** e **Rimozione forzata…**. La seconda modalità risolve il blocco dei driver Kyocera che condividono file con quelli ISAFOM, per esempio TASKalfa 5052ci e 4052ci insieme alla versione 8.2 del 3554ci.
+In **Debug e verifica** sono disponibili **Rimuovi completamente…** e **Rimozione forzata selettiva…**. La seconda modalità permette di scegliere esplicitamente una o più code ISAFOM, comprese copie e installazioni incomplete, conservando le risorse necessarie alle altre stampanti.
 
-La modalità forzata ricostruisce il gruppo di dipendenze prima della conferma: registrazioni dei modelli Kyocera KX collegati, pacchetti OEM corrispondenti, tutte le code che li utilizzano, porte e file locali. Il gruppo può estendersi a ulteriori modelli Kyocera se condividono a loro volta gli stessi componenti. Le code condivise e l'eventuale stampante predefinita sono indicate nell'elenco. Eliminare quelle code ne rimuove anche le impostazioni globali e può interrompere l'uso da parte di altri utenti; vengono pulite le preferenze corrispondenti nel profilo che avvia il tool.
+L'inventario è aggiornabile e indica nome, driver, porta, IP/host e stato. Le checkbox sono inizialmente vuote. Stampante predefinita, code condivise/remotamente connesse, stampanti di sistema, non pertinenti e con identità ambigua sono protette. Il GUID di istanza Windows distingue copie e code ricreate con lo stesso nome.
 
-Aprire **Rimozione forzata…**, controllare l'elenco, spuntare la conferma e premere **Rimuovi forzatamente**. Si può passare fra modalità ordinaria e forzata nella stessa finestra; ogni cambio annulla la precedente spunta di conferma. La richiesta UAC di Windows resta necessaria per le modifiche amministrative.
+Aprire **Rimozione forzata selettiva…**, selezionare le code, premere **Controlla selezione…**, leggere il riepilogo, spuntare la conferma e premere **Rimuovi le code confermate**. Ogni cambio di selezione o aggiornamento invalida la conferma. L'helper UAC ricalcola il piano prima di modificare il PC.
 
 ## Porte e residui
 
-Sono comprese le porte delle code coinvolte, anche WSD, e tutte le porte TCP/IP riferite all'host o all'IP ISAFOM, inclusi gli alias rimasti senza coda. L'anteprima elenca ciascuna porta. Prima di cancellarla il tool ricontrolla configurazione e utilizzo; alla fine ne rilegge l'assenza. Una porta ancora utilizzata da una stampante esterna al gruppo impedisce la rimozione completa e viene segnalata.
+Sono candidabili solo le porte TCP/IP dedicate alle code selezionate e riconducibili all'endpoint ISAFOM. Porte condivise, WSD e porte esterne alla selezione restano conservate. Le dipendenze vengono ricontrollate prima delle operazioni e possono soltanto ridurre la pulizia prevista.
 
-Se non ci sono driver registrati né pacchetti da rimuovere, il tool pulisce gli eventuali residui senza un'ulteriore finestra di conferma dell'applicazione. Se non resta alcun elemento, mostra **Nulla da rimuovere** e termina senza UAC. La presenza di altri driver nel gruppo forzato richiede comunque la conferma dell'elenco.
+La rimozione delle code non richiede che il driver sia ancora integro. Driver, pacchetti riconosciuti e file noti vengono eliminati solo se è dimostrato che non servono ad altre code, registrazioni o dispositivi. I casi non verificabili restano residui espliciti o risorse conservate. Cache, configurazione e cache delle preferenze nei profili restano fuori dalla pulizia selettiva.
 
-La rimozione conserva i controlli della 0.2.6 su percorsi, hash, processi dedicati Kyocera e rilettura finale. In modalità forzata PnPUtil riceve `/force` soltanto per i pacchetti dell'elenco approvato, dopo i controlli delle dipendenze. Non vengono inviati `/uninstall` o `/reboot`. Il significato dei parametri è nella [documentazione Microsoft](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/pnputil-command-syntax#delete-driver).
+Il percorso selettivo non usa `/force`, reset dello spooler, chiusure di processi o cancellazioni di lavori. Il recupero di una coda usa soltanto la stessa istanza Winspool identificata e verificata.
 
-Lavori pendenti o non enumerabili, risorse di altri produttori e dispositivi fisici non compresi nel piano restano motivi di blocco. Il tool non elimina lavori di stampa. Se il sistema lascia un pacchetto, un file o una porta, l'esito resta incompleto; l'eventuale richiesta di riavvio viene mantenuta. Prima della modifica viene ricostruito il piano amministrativo: un elenco cambiato invalida la conferma.
+Lavori pendenti o non verificabili bloccano la coda interessata. Il comando Windows concluso senza errori non è una prova di rimozione: l'assenza viene riletta. Ogni coda riceve un esito individuale, con residui e risorse condivise conservate. Una richiesta di riavvio di Windows lascia l'esito parziale e non provoca un riavvio automatico.
 
 ## Installazione e validazione
 

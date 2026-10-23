@@ -124,7 +124,16 @@ try {
         Get-IsafomRemovalPlan $s ([Security.Principal.WindowsIdentity]::GetCurrent().User.Value) $forceRemoval | ConvertTo-Json -Depth 8 -Compress
         exit 0
     }
-    if ($request.Mode -cnotin @('Ensure','Remove','FinalizeRemovalFiles')) { throw 'Protocol' }
+    if ($request.Mode -ceq 'SelectiveInventory') {
+        $rows=@(Get-IsafomSelectiveInventory $s ([Security.Principal.WindowsIdentity]::GetCurrent().User.Value)|Select-Object * -ExcludeProperty Object,IdentityComment)
+        ConvertTo-Json -InputObject $rows -Depth 8 -Compress
+        exit 0
+    }
+    if ($request.Mode -ceq 'PlanSelectiveRemoval') {
+        Get-IsafomSelectivePlan $s ([Security.Principal.WindowsIdentity]::GetCurrent().User.Value) @($request.QueueIds) | ConvertTo-Json -Depth 8 -Compress
+        exit 0
+    }
+    if ($request.Mode -cnotin @('Ensure','Remove','RemoveSelected','FinalizeRemovalFiles')) { throw 'Protocol' }
     $ownerSid = [Security.Principal.SecurityIdentifier]::new([string]$request.OwnerSid)
     if ($ownerSid.Value -notmatch '^S-1-5-21-(\d+-){3}\d+$') { throw 'Protocol' }
     $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
@@ -136,6 +145,10 @@ try {
     }
     if($request.Mode -ceq 'Remove'){
         Invoke-IsafomRemoval $s $ownerSid.Value ([string]$request.PlanFingerprint) ([bool]$request.RemoveDriver) ([bool]$request.AllowSpoolerRestart) $forceRemoval | ConvertTo-Json -Depth 8 -Compress
+        exit 0
+    }
+    if($request.Mode -ceq 'RemoveSelected'){
+        Invoke-IsafomSelectiveRemoval $s $ownerSid.Value @($request.QueueIds) ([string]$request.PlanFingerprint)|ConvertTo-Json -Depth 10 -Compress
         exit 0
     }
     if ($request.Endpoint -ine $s.Host -and ($request.Endpoint -cne $s.FallbackIPv4 -or -not $s.AllowFallbackOnDnsFailure)) { throw 'Protocol' }

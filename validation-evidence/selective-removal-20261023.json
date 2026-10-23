@@ -1,0 +1,44 @@
+{
+  "SchemaVersion": 1,
+  "DateLocal": "2026-10-23",
+  "Timezone": "Europe/Rome",
+  "BaseCommit": "56d7ce878526a92214ec44885f1eb9d8bc4e53ec",
+  "Scope": "Public source revision: selective forced removal; no proprietary payloads",
+  "Command": "pwsh -NoProfile -File build/Test-SourceAudit.ps1",
+  "Sdk": "10.0.402",
+  "BuildWarnings": 0,
+  "BuildErrors": 0,
+  "Passed": {
+    "Core": 84,
+    "WindowsUiPrivacy": 17,
+    "InstallerSourceAudit": 53,
+    "SelectiveUiProtocolIncludedInInstaller": 10,
+    "GuiDpi": 122,
+    "BackendIdentity": 17,
+    "OrdinaryRemovalPerEngine": 31,
+    "SelectiveRemovalPerEngine": 39,
+    "EmbeddedReadOnlySelectiveInventory": true
+  },
+  "RemovalTestEngines": ["PowerShell 7", "Windows PowerShell 5.1"],
+  "Acceptance": {
+    "TwoOfFiveSelectedQueuesOnly": true,
+    "ThreeExcludedQueuesIdentical": true,
+    "SharedDriverAndPortRetained": true,
+    "OnlyDedicatedSelectedPortDeleted": true,
+    "NoAutomaticDependencyExpansion": true,
+    "NoGlobalRecoveryInSelectivePath": true,
+    "CompletedReplayDoesNotMutate": true,
+    "NativeRecoveryInteropCompiles": true
+  },
+  "LiveReadOnlyChecks": {
+    "QueueDriverPortMetadataUnchanged": true,
+    "DefaultPrinterUnchanged": true,
+    "SelectableRowsHaveUniqueWindowsIdentityAndAssociation": true
+  },
+  "DestructiveWindowsMutationsMocked": true,
+  "RealNativeRemovalExecuted": false,
+  "PhysicalPrintingPerformed": false,
+  "VendorPayloadAndCatalogChecksExecuted": false,
+  "PublishedInstallerValidated": false,
+  "HostInventoryOrPersonalValuesIncluded": false
+}

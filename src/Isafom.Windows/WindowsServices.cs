@@ -86,6 +86,9 @@ public static class PowerShellBackend
         using var removalSource = Assembly.GetExecutingAssembly().GetManifestResourceStream("Isafom.Windows.Scripts.RemovalBackend.ps1")!;
         using var removalReader = new StreamReader(removalSource);
         code = await removalReader.ReadToEndAsync(token) + Environment.NewLine + code;
+        using var selectiveSource = Assembly.GetExecutingAssembly().GetManifestResourceStream("Isafom.Windows.Scripts.SelectiveRemoval.ps1")!;
+        using var selectiveReader = new StreamReader(selectiveSource);
+        code = await selectiveReader.ReadToEndAsync(token) + Environment.NewLine + code;
         using var knownSource=Assembly.GetExecutingAssembly().GetManifestResourceStream("Isafom.Windows.Driver.KnownSpoolFiles.json")!;
         using var knownReader=new StreamReader(knownSource);
         string knownJson=await knownReader.ReadToEndAsync(token);
@@ -114,7 +117,7 @@ public static class PowerShellBackend
         try
         {
             using var document = JsonDocument.Parse(output);
-            if (document.RootElement.TryGetProperty("Ok", out var ok) && ok.ValueKind == JsonValueKind.False)
+            if (document.RootElement.ValueKind == JsonValueKind.Object && document.RootElement.TryGetProperty("Ok", out var ok) && ok.ValueKind == JsonValueKind.False)
             {
                 var failure = JsonSerializer.Deserialize<MachineReply>(output, Options);
                 if (typeof(T) == typeof(MachineReply) && failure is not null) return (T)(object)failure;
@@ -182,8 +185,8 @@ public sealed class WindowsMachine(PrinterSettings settings) : IWindowsMachine
 }
 
 public enum MachineStep { None, Elevation, Handshake, Inspect, Driver, Port, Queue, Pause, Complete }
-public sealed record MachineReply(bool Ok, ErrorCode? Code, MachineStep Step = MachineStep.None, string? NativeCode = null, RemovalResult? Removal = null);
-public sealed record MachineRequest(string ConfigFingerprint, string Endpoint, string OwnerSid, string Operation = "Ensure", string? PlanFingerprint = null, bool RemoveDriver = false, string? DriverVersion = null,bool AllowSpoolerRestart=false,bool ForceRemoval=false);
+public sealed record MachineReply(bool Ok, ErrorCode? Code, MachineStep Step = MachineStep.None, string? NativeCode = null, RemovalResult? Removal = null, SelectiveQueueResult[]? SelectiveRemoval = null);
+public sealed record MachineRequest(string ConfigFingerprint, string Endpoint, string OwnerSid, string Operation = "Ensure", string? PlanFingerprint = null, bool RemoveDriver = false, string? DriverVersion = null,bool AllowSpoolerRestart=false,bool ForceRemoval=false, string[]? QueueIds=null);
 
 public static class MachineElevation
 {
@@ -202,7 +205,7 @@ public static class MachineElevation
         // Bounded protocol. No StreamReader buffering of arbitrarily large messages.
         var bytes = new List<byte>();
         var one = new byte[1];
-        while (bytes.Count < 2048)
+        while (bytes.Count < 4 * 1024 * 1024)
         {
             if (await stream.ReadAsync(one, token) == 0) throw new InstallerException(ErrorCode.Protocol);
             if (one[0] == 10) return Encoding.UTF8.GetString(bytes.ToArray());
@@ -223,7 +226,11 @@ public static class MachineElevation
         => (await RunOperationAsync(settings, "", "Remove", fingerprint, removeDriver, CancellationToken.None,allowSpoolerRestart,forceRemoval)).Removal
             ?? throw new InstallerException(ErrorCode.Protocol);
 
-    private static async Task<MachineReply> RunOperationAsync(PrinterSettings settings, string endpoint, string operation, string? fingerprint, bool removeDriver, CancellationToken token,bool allowSpoolerRestart=false,bool forceRemoval=false)
+    internal static async Task<SelectiveQueueResult[]> RemoveSelectedAsync(PrinterSettings settings, string fingerprint, string[] queueIds)
+        => (await RunOperationAsync(settings, "", "RemoveSelected", fingerprint, false, CancellationToken.None, queueIds:queueIds)).SelectiveRemoval
+            ?? throw new InstallerException(ErrorCode.Protocol);
+
+    private static async Task<MachineReply> RunOperationAsync(PrinterSettings settings, string endpoint, string operation, string? fingerprint, bool removeDriver, CancellationToken token,bool allowSpoolerRestart=false,bool forceRemoval=false,string[]? queueIds=null)
     {
         string pipeName = "ISAFOM-" + Guid.NewGuid().ToString("N");
         var security = new PipeSecurity();
@@ -249,7 +256,7 @@ public static class MachineElevation
                 throw new InstallerException(ErrorCode.MachineFailure);
             await connection;
             if (!GetNamedPipeClientProcessId(pipe.SafePipeHandle, out var clientPid) || clientPid != process.Id) throw new InstallerException(ErrorCode.Protocol);
-            await WriteAsync(pipe, new MachineRequest(settings.Fingerprint(), endpoint, WindowsIdentity.GetCurrent().User!.Value, operation, fingerprint, removeDriver, settings.DriverVersion,allowSpoolerRestart,forceRemoval), timeout.Token);
+            await WriteAsync(pipe, new MachineRequest(settings.Fingerprint(), endpoint, WindowsIdentity.GetCurrent().User!.Value, operation, fingerprint, removeDriver, settings.DriverVersion,allowSpoolerRestart,forceRemoval,queueIds), timeout.Token);
             var reply = JsonSerializer.Deserialize<MachineReply>(await ReadLineAsync(pipe, timeout.Token)) ?? throw new InstallerException(ErrorCode.Protocol);
             LastStep = reply.Step;
             LastNativeCode = reply.NativeCode is not null && System.Text.RegularExpressions.Regex.IsMatch(reply.NativeCode, "^0x[0-9A-Fa-f]{8}$") ? reply.NativeCode : null;
@@ -269,10 +276,14 @@ public static class MachineElevation
             if (!GetNamedPipeServerProcessId(pipe.SafePipeHandle, out var serverPid) || serverPid != parentPid) return 2;
             var request = JsonSerializer.Deserialize<MachineRequest>(await ReadLineAsync(pipe, timeout.Token)) ?? throw new InstallerException(ErrorCode.Protocol);
             var settings = DriverProfiles.Select(AdminConfiguration.Load(), request.DriverVersion ?? DriverProfiles.DefaultVersion);
-            if (request.ConfigFingerprint != settings.Fingerprint() || request.Operation is not ("Ensure" or "Remove")) throw new InstallerException(ErrorCode.Configuration);
+            if (request.ConfigFingerprint != settings.Fingerprint() || request.Operation is not ("Ensure" or "Remove" or "RemoveSelected")) throw new InstallerException(ErrorCode.Configuration);
             if (request.Operation == "Ensure" && !Planner.IsTarget(settings, request.Endpoint)) throw new InstallerException(ErrorCode.Configuration);
-            if (request.Operation == "Remove" && (request.Endpoint.Length != 0 || request.PlanFingerprint is null ||
+            if (request.Operation is ("Remove" or "RemoveSelected") && (request.Endpoint.Length != 0 || request.PlanFingerprint is null ||
                 !System.Text.RegularExpressions.Regex.IsMatch(request.PlanFingerprint, "\\A[A-F0-9]{64}\\z"))) throw new InstallerException(ErrorCode.Protocol);
+            if(request.ForceRemoval)throw new InstallerException(ErrorCode.Protocol);
+            if(request.Operation == "RemoveSelected" && (request.QueueIds is not {Length: >0 and <=128} ||
+                request.QueueIds.Any(id=>!Guid.TryParseExact(id,"D",out _)) || request.QueueIds.Distinct(StringComparer.OrdinalIgnoreCase).Count()!=request.QueueIds.Length))
+                throw new InstallerException(ErrorCode.Protocol);
             if (ProcessIdentity.UserSid(parentPid) != request.OwnerSid) throw new InstallerException(ErrorCode.Protocol);
             // Defense in depth: direct helper invocation cannot bypass the unavailable adapter gate.
             var support = new Kx85Preferences(settings).Support(settings);
@@ -283,6 +294,13 @@ public static class MachineElevation
             if (!acquired) throw new InstallerException(ErrorCode.Busy);
             try
             {
+                if(request.Operation == "RemoveSelected")
+                {
+                    var selected = await PowerShellBackend.RunAsync<MachineReply>(new {Mode="RemoveSelected",Settings=settings,
+                        OwnerSid=request.OwnerSid,request.PlanFingerprint,request.QueueIds},CancellationToken.None);
+                    await WriteAsync(pipe,selected,timeout.Token);
+                    return selected.Ok ? 0 : 1;
+                }
                 if(request.Operation == "Remove")
                 {
                     if(!request.RemoveDriver)throw new InstallerException(ErrorCode.RemovalBlocked);

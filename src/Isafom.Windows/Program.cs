@@ -79,9 +79,15 @@ public static class Program
                 File.WriteAllText(Path.GetFullPath(args[1]), JsonSerializer.Serialize(report, new JsonSerializerOptions { WriteIndented = true }));
                 return 0;
             }
-            if (args.Length == 2 && args[0] is "--removal-preview-output" or "--force-removal-preview-output")
+            if(args.Length == 2 && args[0] == "--force-removal-preview-output")
             {
-                var plan = RemovalService.PreviewAsync(AdminConfiguration.Load(),forceRemoval:args[0]=="--force-removal-preview-output").GetAwaiter().GetResult();
+                var inventory=SelectiveRemovalService.InventoryAsync(AdminConfiguration.Load()).GetAwaiter().GetResult();
+                File.WriteAllText(args[1],JsonSerializer.Serialize(inventory,new JsonSerializerOptions{WriteIndented=true}));
+                return 0;
+            }
+            if (args.Length == 2 && args[0] == "--removal-preview-output")
+            {
+                var plan = RemovalService.PreviewAsync(AdminConfiguration.Load()).GetAwaiter().GetResult();
                 File.WriteAllText(Path.GetFullPath(args[1]), JsonSerializer.Serialize(plan, new JsonSerializerOptions { WriteIndented = true }));
                 return 0;
             }

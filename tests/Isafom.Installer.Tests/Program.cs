@@ -31,6 +31,8 @@ internal static class Tests
             catch(InstallerException error){Console.WriteLine(JsonSerializer.Serialize(new{Reachable=false,Reason=error.Code.ToString(),PrintSent=false}));}
             return 0;
         }
+        if(args.SequenceEqual(["--selective-removal"])) return SelectiveRemovalChecks.Run();
+        if(args.SequenceEqual(["--selective-live"])) return SelectiveRemovalChecks.RunLive();
         int passed = 0;
         void Check(bool value,string label) { if(!value)throw new Exception(label); passed++; }
         try
@@ -41,7 +43,8 @@ internal static class Tests
             Check(!provider.Support(settings with {DriverVersion="8.5.9999.0"}).Available,"Other versions not enabled");
             Check(provider.Support(settings with {DriverVersion=DriverProfiles.DefaultVersion}).Available,"8.5 remains available as the default");
             Check(provider.Support(settings with {DriverVersion=DriverProfiles.OptionalVersion}).Available,"8.7 is supported only when explicitly selected");
-            foreach(string version in new[]{DriverProfiles.DefaultVersion,DriverProfiles.OptionalVersion})
+            if(args.SequenceEqual(["--source-audit"]))Console.WriteLine("SKIP Proprietary driver payload checks: source audit without vendor archives.");
+            else foreach(string version in new[]{DriverProfiles.DefaultVersion,DriverProfiles.OptionalVersion})
             {
                 var profile=DriverProfiles.Select(settings,version);
                 using(var payload=DriverPackage.OpenEmbedded(profile))Check(Convert.ToHexString(SHA256.HashData(payload))==profile.DriverArchiveSha256,"Embedded driver matches the configured exact archive hash");
@@ -106,15 +109,7 @@ internal static class Tests
             driverOnly.Acknowledgement.IsChecked=true;
             Check(driverOnly.RemoveButton.IsEnabled,"Complete reset also handles an already absent queue");
             driverOnly.Close();
-            var expanded=removalPlan with {ForceRemoval=true,QueuesToRemove=[new("Kyocera reparto",settings.DriverName,"IP_OLD",0,true,false)],
-                PortsToRemove=[new("IP_OLD","192.0.2.1",1,9100)]};
-            var forceWindow=new RemovalWindow(removalPlan with {CanProceed=false,BlockedCode=ErrorCode.RemovalShared},expanded);
-            forceWindow.ForceChoice.IsChecked=true;forceWindow.Acknowledgement.IsChecked=true;
-            Check(forceWindow.SelectedPlan==expanded&&forceWindow.RemoveButton.IsEnabled,"Force selection exposes and confirms the expanded removal scope");
-            Check(forceWindow.SelectedPlan.Description.Contains("Kyocera reparto")&&forceWindow.SelectedPlan.Description.Contains("IP_OLD"),"Force confirmation names the affected queue and port");
-            forceWindow.ForceChoice.IsChecked=false;
-            Check(forceWindow.Acknowledgement.IsChecked==false&&!forceWindow.RemoveButton.IsEnabled,"Changing force scope invalidates the previous acknowledgement");
-            forceWindow.Close();
+            SelectiveRemovalChecks.CheckUi(Check);
             var residueOnly=removalPlan with {DriverPresent=false,QueueName=null,DownloadCachePresent=true};
             Check(!residueOnly.RequiresConfirmation&&residueOnly.HasWork,"Driver-absent residue cleanup needs no redundant application confirmation");
             Check(!(residueOnly with {DownloadCachePresent=false}).HasWork,"An empty removal plan is a no-op before dialog or elevation");

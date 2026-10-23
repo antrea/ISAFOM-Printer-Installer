@@ -3,6 +3,7 @@
 | Percorso | Contenuto |
 | --- | --- |
 | `src/Isafom.Windows` | Installer WPF, log, roadmap, adattatore KX, rimozione, icone, backend incorporati |
+| `src/Isafom.Windows/SelectiveRemoval.cs`, `Scripts/SelectiveRemoval.ps1` | Inventario, selezione esplicita e rimozione forzata per istanza Windows, con risorse condivise protette |
 | `src/Isafom.Core` | Configurazione, profili driver, pianificazione e verifica |
 | `src/Isafom.Collector` | Raccoglitore GUI di impostazioni e confronti |
 | `src/Isafom.ConfigExtractor` | Estrattore, verificatore e osservazioni con sentinelle |
@@ -11,6 +12,7 @@
 | `diagnostics` | Script autonomi di lettura e confronto |
 | `tools` | Wrapper e script di laboratorio, con nomi di output storici |
 | `build` | Compilazione, preparazione payload, configurazione amministrativa e icona |
+| `build/Test-SourceAudit.ps1` | Audit senza driver proprietari, regressioni selettive e letture reali senza modifiche alle stampanti |
 | `config` | Parametri amministrativi, senza dati personali |
 | `driver` | Manifest, impronte, nomi dei componenti e istruzioni; nessun driver binario |
 | `research/reverse-kx85` | Codec e script originali di analisi, senza librerie del fornitore o disassemblati |

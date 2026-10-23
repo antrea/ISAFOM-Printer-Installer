@@ -30,6 +30,7 @@
     <Compile Include="../Isafom.Collector/WindowPlacement.cs" Link="UI/WindowPlacement.cs" />
     <EmbeddedResource Include="Scripts/PrinterBackend.ps1" />
     <EmbeddedResource Include="Scripts/RemovalBackend.ps1" />
+    <EmbeddedResource Include="Scripts/SelectiveRemoval.ps1" />
     <EmbeddedResource Include="Scripts/DriverLocks.cs.txt" LogicalName="Isafom.Windows.Scripts.DriverLocks.cs.txt" WithCulture="false" />
     <EmbeddedResource Include="../../driver/KX_8.7.0917_x64.zip" LogicalName="Isafom.Windows.Driver.Kx87X64.zip" />
     <EmbeddedResource Include="../../driver/KX_8.5.2405_x64.zip" LogicalName="Isafom.Windows.Driver.Kx85X64.zip" />

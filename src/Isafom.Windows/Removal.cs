@@ -8,7 +8,7 @@ using Isafom.Core;
 namespace Isafom.Windows;
 
 public sealed record RemovalPackage(string Name, string Sha256);
-public sealed record RemovalDriver(string Name,string Environment);
+public sealed record RemovalDriver(string Name,string Environment,string? Signature=null);
 public sealed record RemovalDriverFile(string Path,string Sha256);
 public sealed record RemovalQueue(string Name,string DriverName,string PortName,int Jobs,bool Shared,bool IsDefault);
 public sealed record RemovalPort(string Name,string Host,int Protocol,int PortNumber,string? Monitor=null);
@@ -24,7 +24,6 @@ public sealed record RemovalPlan(string? QueueName, bool ManualQueue, int Jobs, 
     public bool HasWork=>QueueName is not null||RequiresConfirmation||(DriverFiles??[]).Length>0||(QueuesToRemove??[]).Length>0||
         PortName is not null||(PortsToRemove??[]).Length>0||DownloadCachePresent||SettingsFilePresent||UserPreferencesPresent;
     public string Description =>
-        (ForceRemoval?"RIMOZIONE FORZATA — comprende anche gli altri modelli e le code Kyocera collegati ai file condivisi. Le code elencate e le loro impostazioni verranno eliminate.\n\n":"")+
         $"Coda principale ISAFOM: {QueueName ?? "già assente"}\n" +
         ((QueuesToRemove??[]).Length>0?"Tutte le code da eliminare:\n• "+string.Join("\n• ",QueuesToRemove!.Select(q=>q.Name+(q.Shared?" [CONDIVISA]":"")+(q.IsDefault?" [PREDEFINITA]":"")))+"\n":"")+
         (QueueName is null ? "" : "Verranno eliminate le impostazioni di questa coda, inclusi Nome, Job Accounting e codice privato salvati nel driver.\n") +
@@ -100,13 +99,12 @@ internal sealed class RemovalWindow : Window
 {
     internal CheckBox Acknowledgement { get; } = new() { Margin = new(0,10,0,12) };
     internal Button RemoveButton { get; } = new() { Content = "Rimuovi completamente", Background = new SolidColorBrush(Color.FromRgb(181,47,47)), Foreground = Brushes.White, Padding = new(18,8,18,8), MinHeight = 36, IsEnabled = false };
-    internal CheckBox ForceChoice { get; }=new(){Margin=new(0,0,0,12)};
     internal RemovalPlan SelectedPlan {get;private set;}
     private readonly Isafom.Collector.WindowPlacement placement;
 
-    internal RemovalWindow(RemovalPlan plan,RemovalPlan? forcedPlan=null,bool startForced=false)
+    internal RemovalWindow(RemovalPlan plan)
     {
-        SelectedPlan=startForced&&forcedPlan is not null?forcedPlan:plan;
+        SelectedPlan=plan;
         Title = "Rimuovi completamente la stampante ISAFOM"; Width=660;Height=620;MinWidth=360;MinHeight=300;
         FontFamily=new FontFamily("Segoe UI");FontSize=13;Background=new SolidColorBrush(Color.FromRgb(247,249,251));
         Icon = System.Windows.Application.Current?.MainWindow?.Icon;
@@ -120,9 +118,6 @@ internal sealed class RemovalWindow : Window
         actions.Children.Add(cancel);actions.Children.Add(RemoveButton);dock.Children.Add(actions);
         var content=new StackPanel();
         content.Children.Add(new TextBlock { Text="Controlla cosa verrà rimosso",FontSize=20,FontWeight=FontWeights.SemiBold,TextWrapping=TextWrapping.Wrap,Margin=new(0,0,0,12) });
-        ForceChoice.Content=new TextBlock {Text="Forza la rimozione: includi gli altri driver e le code Kyocera che condividono i file",TextWrapping=TextWrapping.Wrap,FontWeight=FontWeights.SemiBold,Foreground=new SolidColorBrush(Color.FromRgb(181,47,47))};
-        ForceChoice.IsEnabled=forcedPlan is not null;ForceChoice.Visibility=forcedPlan is null?Visibility.Collapsed:Visibility.Visible;
-        content.Children.Add(ForceChoice);
         var description=new TextBlock {Text=SelectedPlan.Description,TextWrapping=TextWrapping.Wrap};
         content.Children.Add(description);
         Acknowledgement.Content=new TextBlock { Text="Confermo la rimozione degli elementi elencati. Per liberare i file autorizzo anche il riavvio del servizio di stampa e la chiusura dei soli componenti dedicati del driver Kyocera, se necessari e solo quando tutte le code risultano vuote.",TextWrapping=TextWrapping.Wrap };
@@ -131,15 +126,6 @@ internal sealed class RemovalWindow : Window
         dock.Children.Add(new ScrollViewer { Content=content,VerticalScrollBarVisibility=ScrollBarVisibility.Auto,HorizontalScrollBarVisibility=ScrollBarVisibility.Disabled });
         Content=dock;
         void Update() => RemoveButton.IsEnabled=SelectedPlan.CanProceed&&SelectedPlan.FullRemoval&&Acknowledgement.IsChecked==true;
-        void SelectMode()
-        {
-            SelectedPlan=ForceChoice.IsChecked==true&&forcedPlan is not null?forcedPlan:plan;
-            Acknowledgement.IsChecked=false;Acknowledgement.IsEnabled=SelectedPlan.CanProceed;
-            description.Text=SelectedPlan.Description;
-            RemoveButton.Content=SelectedPlan.ForceRemoval?"Rimuovi forzatamente":"Rimuovi completamente";Update();
-        }
-        ForceChoice.Checked+=(_,_)=>SelectMode();ForceChoice.Unchecked+=(_,_)=>SelectMode();
-        ForceChoice.IsChecked=startForced&&forcedPlan is not null;
         Acknowledgement.Checked+=(_,_)=>Update();Acknowledgement.Unchecked+=(_,_)=>Update();
         RemoveButton.Click+=(_,_)=>DialogResult=true;
         placement=new(this,660,620,minimumHeight:300,minimumWidth:360);placement.Attach();

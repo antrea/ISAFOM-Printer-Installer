@@ -71,8 +71,8 @@ function Get-IsafomSelectiveInventory($s,[string]$OwnerSid) {
             ($portInventoryKnown -and @($portNames|Where-Object {$_ -notin $installedPorts}).Count -gt 0)
         $default=Test-IsafomOriginalDefault $OwnerSid $name
         $protection=''
-        if($driver -match '^(Microsoft |Remote Desktop |OneNote|Fax\b)' -or @($portNames|Where-Object {$_ -match '^(TS[0-9]+|PORTPROMPT:|nul:)$'}).Count){$protection='Stampante di sistema'}
-        elseif(-not $local){$protection='Connessione remota protetta'}
+        if($driver -match '^(Microsoft (Print to PDF|XPS Document Writer|Shared Fax Driver)(\s|$)|Remote Desktop |OneNote|Send to (Microsoft )?OneNote|Fax\b)'){$protection='Stampante di sistema'}
+        elseif(-not $local -or @($portNames|Where-Object {$_ -match '^TS[0-9]+$'}).Count){$protection='Connessione remota protetta'}
         elseif($shared){$protection='Coda condivisa con altri utenti'}
         elseif(($comment -match '^CNR-ISAFOM Printer Installer' -or $comment -ceq 'Autore: Andrea Esposito - andrea.esposito@cnr.it') -and -not $owned){$protection='Installazione di un altro utente o proprietà non verificata'}
         elseif(-not $id -or $q.Count -gt 1 -or $r.Count -ne 1){$protection='Identità Windows non univoca o non disponibile'}

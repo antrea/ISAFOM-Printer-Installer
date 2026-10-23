@@ -89,8 +89,8 @@
     },
     {
       "Path": "docs/ARCHITETTURA.md",
-      "Bytes": 5764,
-      "Sha256": "1521BA19EDC638B4CE394D38BEB290B770EB0D8AA41A43C78507A35D10EF98C9"
+      "Bytes": 6232,
+      "Sha256": "59F621657445B0B2D3D01204B383A7898F02201E378196A4687508664515CBAA"
     },
     {
       "Path": "docs/DIAGNOSTICA.md",
@@ -534,8 +534,8 @@
     },
     {
       "Path": "src/Isafom.Windows/Scripts/SelectiveRemoval.ps1",
-      "Bytes": 31083,
-      "Sha256": "FA0AB630364250B78587421C8CB6091F77C7DACC1977BEB5CC233CE1086EA7F9"
+      "Bytes": 31151,
+      "Sha256": "26DF044FFCD758E3E6C60F72909DF45C267D5EA4E2DC55D4112C3AC48A5A95B4"
     },
     {
       "Path": "src/Isafom.Windows/SelectiveRemoval.cs",
@@ -654,8 +654,8 @@
     },
     {
       "Path": "tests/Test-ForcedRemoval.ps1",
-      "Bytes": 31096,
-      "Sha256": "7EB901C8BC12FF3F4034068B8E37DFD70A0EC6392DDCE91D403568BAA0254862"
+      "Bytes": 31968,
+      "Sha256": "8462F03012DA2814F6FBB46A11CC0DD76AB44AE797F2470E282834C6F6C60FDA"
     },
     {
       "Path": "tests/Test-NativeDriverInventory.ps1",
@@ -764,8 +764,8 @@
     },
     {
       "Path": "validation-evidence/selective-related-queues-20261023.json",
-      "Bytes": 2098,
-      "Sha256": "A2571BE1D051C63E89C2E0E074D096188A03E8D5BD0488A7B05CD9865CCAE8B5"
+      "Bytes": 2224,
+      "Sha256": "59B0B91735DA958220120AD871797489E32391BD933855C38426D38BD9575915"
     },
     {
       "Path": "validation-evidence/selective-removal-20261023.json",
@@ -774,8 +774,8 @@
     },
     {
       "Path": "VALIDATION.md",
-      "Bytes": 8764,
-      "Sha256": "97AB4452252A423CAF294F10B86A2401CBBF29EA1309054587C70FD5234AEFF8"
+      "Bytes": 8973,
+      "Sha256": "010D0710F0FFF4450BCB58B356AF8A39399A79DBD5B631C21240FD7D0FA229B3"
     }
   ]
 }

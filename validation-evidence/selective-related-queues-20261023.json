@@ -21,7 +21,7 @@
     "BackendIdentity": 17,
     "CatalogTrust": 4,
     "OrdinaryRemoval": 31,
-    "FinalSelectiveRemovalPerEngine": 70,
+    "FinalSelectiveRemovalPerEngine": 72,
     "EmbeddedReadOnlySelectiveInventory": true
   },
   "RemovalTestEngines": ["PowerShell 7", "Windows PowerShell 5.1"],
@@ -41,7 +41,9 @@
     "SelectedReferenceMayBeRemovedBeforeRelatedSelectedQueue": true,
     "EndpointChangeMidBatchRejectsStaleConsent": true,
     "EndpointRecheckedWhileNativeHandleIsOpen": true,
-    "UniqueIdentityAndSystemProtectionsRetained": true
+    "UniqueIdentityAndSystemProtectionsRetained": true,
+    "PhysicalMicrosoftClassDriverIsNotASystemPrinter": true,
+    "KyoceraOnFilePortSelectableWhilePrintToPdfProtected": true
   },
   "NetworkReachabilityOrDnsLookupRequired": false,
   "BothOfficialDriverPayloadsValidated": true,

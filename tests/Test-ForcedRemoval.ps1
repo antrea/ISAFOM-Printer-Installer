@@ -40,7 +40,7 @@ function Get-PrinterDriver {param($ErrorAction) if($script:DriverReadFails){thro
 function Get-PrinterPort {param($ErrorAction) if($script:PortReadFails){throw 'PortProviderFailure'};$script:Ports}
 function Get-IsafomSelectiveDriverNames {
     if($script:DriverReadFails){throw 'DriverProviderFailure'}
-    @(@($script:Drivers|ForEach-Object Name)+@('HP','Microsoft Print to PDF','Kyocera ECOSYS M5526cdw KX','Universal wrong driver','Epson','Brother','Unrecognized driver')|Where-Object {$_ -cne $script:MissingDriver})
+    @(@($script:Drivers|ForEach-Object Name)+@('HP','Microsoft Print to PDF','Microsoft IPP Class Driver','Kyocera ECOSYS M5526cdw KX','Universal wrong driver','Epson','Brother','Unrecognized driver')|Where-Object {$_ -cne $script:MissingDriver})
 }
 function Test-IsafomOriginalDefault {param($OwnerSid,$QueueName) $QueueName -ceq $script:DefaultName}
 function Test-IsafomManagedQueue {param($name,$comment,$marker) Test-IsafomQueueIdentity $comment $null $marker}
@@ -368,6 +368,17 @@ $row=@(Get-IsafomSelectiveInventory $s $owner)[0];$null=Assert-IsafomSelectiveEn
 $script:Ports[0].HostAddress='192.0.2.91'
 Refused {Assert-IsafomSelectiveEndpoint $row}
 Check ($script:Writes.Count -eq 0) 'Native handle guard rejects a TCP/IP endpoint changed after the inventory read'
+
+Reset-SelectiveCase
+$script:Queues[3].DriverName='Microsoft IPP Class Driver';$script:Queues[3].PortName='IP_1'
+$rows=@(Get-IsafomSelectiveInventory $s $owner)
+Check ($rows[3].CanSelect -and $rows[3].Reasons -contains 'Stessa porta della Kyocera' -and $rows[3].Reasons -notcontains 'Configurazione incompleta') 'A physical Microsoft class driver on the Kyocera port is selectable rather than mistaken for a Windows system printer'
+
+Reset-SelectiveCase
+$script:Queues[0].PortName='PORTPROMPT:';$script:Queues[4].PortName='PORTPROMPT:'
+$script:Ports+=@([pscustomobject]@{Name='PORTPROMPT:';HostAddress='';Protocol=0;PortNumber=0})
+$rows=@(Get-IsafomSelectiveInventory $s $owner)
+Check ($rows[0].CanSelect -and -not $rows[4].CanSelect) 'A Kyocera accidentally installed on a file port is selectable while Windows Print to PDF remains protected'
 
 Reset-SelectiveCase
 $script:Queues[3].PortName='IP_1';$script:Queues[3].Shared=$true

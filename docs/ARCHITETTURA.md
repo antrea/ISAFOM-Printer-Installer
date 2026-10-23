@@ -28,6 +28,8 @@ Sono selezionabili anche code di altre marche con la stessa porta, IP/host o nom
 
 Il piano viene rivalidato prima di ogni intervento. Nel corso di un batch già approvato la scomparsa della coda Kyocera di riferimento non impedisce la rimozione di un'altra istanza selezionata con firma immutata: sono ancora applicate tutte le protezioni specifiche della coda. Non sono mai aggiunte altre istanze al piano. La pulizia delle risorse conserva i controlli di provenienza e uso condiviso anche per code di altre marche.
 
+Le protezioni di sistema riconoscono i driver dei componenti Windows (Print to PDF, XPS, Fax, OneNote e reindirizzamento remoto). Il produttore Microsoft da solo non identifica una stampante di sistema: una coda fisica con Microsoft IPP Class Driver resta selezionabile quando soddisfa i criteri. Analogamente una porta di stampa su file non rende di sistema una coda Kyocera installata per errore su quella porta; la porta stessa resta esclusa dalla pulizia TCP/IP.
+
 Le dipendenze riducono le risorse rimovibili: non aggiungono mai altre code o altri modelli al piano. Porte dedicate, registrazioni, pacchetti INF riconosciuti e file con hash noti vengono rimossi solo dopo nuove verifiche degli utilizzatori; risorse condivise o non verificabili rimangono. Non sono previsti reset dello spooler, chiusure di processi, cancellazioni di lavori, `/force`, recuperi globali dei file o pulizia della configurazione/cache del tool nel percorso selettivo. Ogni coda riceve un esito verificato con residui e risorse conservate. Le regressioni, incluso il caso due code su cinque, sono in `tests/Test-ForcedRemoval.ps1` e `SelectiveRemovalChecks.cs`.
 
 ## Verifiche e limiti

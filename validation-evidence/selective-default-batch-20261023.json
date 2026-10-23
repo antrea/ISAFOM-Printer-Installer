@@ -1,0 +1,51 @@
+{
+  "SchemaVersion": 1,
+  "DateLocal": "2026-10-23",
+  "Timezone": "Europe/Rome",
+  "BaseCommit": "908227f9e67fa33e7f5ba49fafe3cf3cd8f83d72",
+  "Scope": "Selective removal of the explicitly selected default and multiple local Kyocera queues, including incorrect or missing ports",
+  "Command": "pwsh -NoProfile -File build/Build-Installer.ps1 -Dotnet <local SDK>",
+  "Sdk": "10.0.402",
+  "BuildWarnings": 0,
+  "BuildErrors": 0,
+  "Passed": {
+    "Core": 84,
+    "WindowsUiPrivacy": 17,
+    "Installer": 76,
+    "SelectiveUiProtocolIncludedInInstaller": 23,
+    "GuiDpi": 123,
+    "BackendIdentity": 17,
+    "CatalogTrust": 4,
+    "OrdinaryRemoval": 31,
+    "SelectiveRemovalPerEngine": 51,
+    "EmbeddedReadOnlySelectiveInventory": true
+  },
+  "RemovalTestEngines": ["PowerShell 7", "Windows PowerShell 5.1"],
+  "Acceptance": {
+    "TwoOfFiveSelectedQueuesOnly": true,
+    "SelectedDefaultMayBeRemoved": true,
+    "DefaultRemovedLast": true,
+    "SimulatedWindowsDefaultReassignmentDoesNotBlockBatch": true,
+    "MultipleMisconfiguredKyoceraModelsSelectable": true,
+    "UncertainAssociationIsNotClaimedAsIsafom": true,
+    "DedicatedDefaultAndAssociationAcknowledgements": true,
+    "ConfirmationCannotSurviveSelectionOrVisibilityChanges": true,
+    "ThreeExcludedQueuesIdentical": true,
+    "SharedAndUnprovenResourcesRetained": true,
+    "SystemAndUnidentifiableQueuesProtected": true,
+    "DefaultChangeAfterReviewRejected": true,
+    "DefaultRecheckedWhileNativeHandleIsOpen": true,
+    "ConfirmationsReachableInSmallWindow": true
+  },
+  "LiveReadOnlyChecks": {
+    "QueueDriverPortMetadataUnchanged": true,
+    "SessionDefaultPrinterUnchanged": true,
+    "OriginalUserDefaultPrinterUnchanged": true,
+    "InventoryUsesOriginalUserDefaultAlsoInRdp": true
+  },
+  "BothOfficialDriverPayloadsValidated": true,
+  "DestructiveWindowsMutationsMocked": true,
+  "RealNativeRemovalExecuted": false,
+  "PhysicalPrintingPerformed": false,
+  "HostInventoryOrPersonalValuesIncluded": false
+}

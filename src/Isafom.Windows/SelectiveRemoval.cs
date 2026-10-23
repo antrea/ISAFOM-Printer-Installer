@@ -11,8 +11,12 @@ public sealed record SelectiveQueue(string QueueId, string Name, string DriverNa
 public sealed record SelectiveRemovalPlan(SelectiveQueue[] Queues, RemovalPort[] Ports, RemovalDriver[] Drivers,
     RemovalPackage[] Packages, string[] Retained, string Fingerprint, RemovalDriverFile[]? Files=null, string[]? Unresolved=null)
 {
+    public bool RemovesDefaultPrinter => Queues.Any(q => q.IsDefault);
+    public bool RemovesOtherKyocera => Queues.Any(q => !q.Associated);
     public string Description => "Code selezionate (" + Queues.Length + "):\n\n" +
-        string.Join("\n\n", Queues.Select(q => $"• {q.Name}\n  ID Windows: {q.QueueId}\n  Driver: {q.DriverName}\n  Porta: {q.PortName} — {q.Address}\n  Stato: {q.Status}")) +
+        string.Join("\n\n", Queues.Select(q => $"• {q.Name}\n  ID Windows: {q.QueueId}\n  Driver: {q.DriverName}\n  Porta: {q.PortName} — {q.Address}\n  Stato: {q.Status}\n  {q.Association}\n  Predefinita Windows: {(q.IsDefault ? "sì" : "no")}")) +
+        (RemovesDefaultPrinter ? "\n\nATTENZIONE: stai rimuovendo la stampante predefinita. Windows potrà scegliere un’altra predefinita. L’app non ne imposta una al suo posto." : "") +
+        (RemovesOtherKyocera ? "\n\nATTENZIONE: la selezione include code Kyocera non riconosciute come ISAFOM. Controlla nome, ID Windows, driver e porta di ciascuna prima di confermare." : "") +
         "\n\nPorte dedicate da eliminare: " + string.Join(", ", Ports.Select(p => p.Name).DefaultIfEmpty("nessuna")) +
         "\nDriver inutilizzati da eliminare: " + string.Join(", ", Drivers.Select(d => d.Name).DefaultIfEmpty("nessuno")) +
         "\nPacchetti verificati da eliminare: " + string.Join(", ", Packages.Select(p => p.Name).DefaultIfEmpty("nessuno")) +
@@ -51,8 +55,10 @@ internal sealed class SelectiveRemovalWindow : Window
     internal Button RefreshButton { get; } = new() { Content = "Aggiorna elenco", Padding = new(12, 7, 12, 7) };
     internal Button ReviewButton { get; } = new() { Content = "Controlla selezione…", IsEnabled = false, Padding = new(12, 7, 12, 7) };
     internal Button RemoveButton { get; } = new() { Content = "Rimuovi le code confermate", IsEnabled = false, Padding = new(12, 7, 12, 7) };
-    internal CheckBox ShowOthers { get; } = new() { Content = "Mostra anche le altre stampanti (protette)", Margin = new(0, 10, 0, 10) };
+    internal CheckBox ShowOthers { get; } = new() { Content = "Mostra anche le altre stampanti", Margin = new(0, 10, 0, 10) };
     internal CheckBox Acknowledgement { get; } = new() { Content = new TextBlock {Text="Confermo esplicitamente la rimozione delle sole code elencate nel riepilogo.",TextWrapping=TextWrapping.Wrap}, IsEnabled = false, Margin = new(0, 10, 0, 10) };
+    internal CheckBox DefaultAcknowledgement { get; } = new() { Content = new TextBlock { Text = "Confermo anche la rimozione della stampante predefinita indicata nel riepilogo. Windows potrà scegliere un’altra predefinita.", TextWrapping = TextWrapping.Wrap }, IsEnabled = false, Visibility = Visibility.Collapsed, Margin = new(0, 0, 0, 10) };
+    internal CheckBox OtherKyoceraAcknowledgement { get; } = new() { Content = new TextBlock { Text = "Confermo la rimozione delle code Kyocera non riconosciute come ISAFOM elencate nel riepilogo.", TextWrapping = TextWrapping.Wrap }, IsEnabled = false, Visibility = Visibility.Collapsed, Margin = new(0, 0, 0, 10) };
     internal List<CheckBox> QueueChoices { get; } = [];
     internal SelectiveRemovalPlan? ApprovedPlan { get; private set; }
     private SelectiveQueue[] inventory = [];
@@ -81,45 +87,55 @@ internal sealed class SelectiveRemovalWindow : Window
         dock.Children.Add(actions);
         var content = new StackPanel();
         content.Children.Add(new TextBlock { Text = "Seleziona le code da rimuovere", FontSize = 21, FontWeight = FontWeights.SemiBold, TextWrapping = TextWrapping.Wrap });
-        content.Children.Add(new TextBlock { Text = "Le code ISAFOM sono evidenziate. Nessuna selezione iniziale. Le code predefinite, condivise, di sistema e non pertinenti sono protette.", TextWrapping = TextWrapping.Wrap, Margin = new(0, 10, 0, 0) });
+        content.Children.Add(new TextBlock { Text = "Seleziona una o più code. Le code ISAFOM sono evidenziate; sono selezionabili anche altre Kyocera locali, comprese quelle configurate male. Nessuna selezione iniziale. La predefinita e le Kyocera non riconosciute come ISAFOM richiedono una conferma dedicata. Le code condivise, remote, di sistema e con identità non verificabile restano protette.", TextWrapping = TextWrapping.Wrap, Margin = new(0, 10, 0, 0) });
         content.Children.Add(ShowOthers); content.Children.Add(rows);
-        content.Children.Add(summary); content.Children.Add(Acknowledgement);
+        content.Children.Add(summary); content.Children.Add(Acknowledgement); content.Children.Add(DefaultAcknowledgement); content.Children.Add(OtherKyoceraAcknowledgement);
         dock.Children.Add(new ScrollViewer { Content = content, VerticalScrollBarVisibility = ScrollBarVisibility.Auto });
         Content = dock;
         RefreshButton.Click += async (_, _) => await RefreshAsync();
         ReviewButton.Click += async (_, _) => await ReviewAsync();
         ShowOthers.Checked += (_, _) => RenderRows(); ShowOthers.Unchecked += (_, _) => RenderRows();
         Acknowledgement.Checked += (_, _) => UpdateActions(); Acknowledgement.Unchecked += (_, _) => UpdateActions();
-        RemoveButton.Click += (_, _) => { if (ApprovedPlan is not null && Acknowledgement.IsChecked == true && !busy) DialogResult = true; };
+        DefaultAcknowledgement.Checked += (_, _) => UpdateActions(); DefaultAcknowledgement.Unchecked += (_, _) => UpdateActions();
+        OtherKyoceraAcknowledgement.Checked += (_, _) => UpdateActions(); OtherKyoceraAcknowledgement.Unchecked += (_, _) => UpdateActions();
+        RemoveButton.Click += (_, _) => { if (CanConfirmRemoval) DialogResult = true; };
         Loaded += async (_, _) => await RefreshAsync();
         placement = new(this, 920, 740, minimumHeight: 320, minimumWidth: 360); placement.Attach();
     }
 
     private void InvalidatePlan()
-    { ApprovedPlan = null; Acknowledgement.IsChecked = false; Acknowledgement.IsEnabled = false; summary.Text = ""; UpdateActions(); }
+    { ApprovedPlan = null; Acknowledgement.IsChecked = false; DefaultAcknowledgement.IsChecked = false; OtherKyoceraAcknowledgement.IsChecked = false; summary.Text = ""; UpdateActions(); }
+    private bool CanConfirmRemoval => !busy && ApprovedPlan is not null && Acknowledgement.IsChecked == true &&
+        (!ApprovedPlan.RemovesDefaultPrinter || DefaultAcknowledgement.IsChecked == true) &&
+        (!ApprovedPlan.RemovesOtherKyocera || OtherKyoceraAcknowledgement.IsChecked == true);
     private void UpdateActions()
     {
         RefreshButton.IsEnabled = !busy; ShowOthers.IsEnabled = !busy;
         foreach (var choice in QueueChoices) choice.IsEnabled = !busy && ((SelectiveQueue)choice.Tag).CanSelect;
         ReviewButton.IsEnabled = !busy && QueueChoices.Any(c => c.IsChecked == true);
         Acknowledgement.IsEnabled = !busy && ApprovedPlan is not null;
-        RemoveButton.IsEnabled = !busy && ApprovedPlan is not null && Acknowledgement.IsChecked == true;
+        DefaultAcknowledgement.Visibility = ApprovedPlan?.RemovesDefaultPrinter == true ? Visibility.Visible : Visibility.Collapsed;
+        DefaultAcknowledgement.IsEnabled = !busy && ApprovedPlan?.RemovesDefaultPrinter == true;
+        OtherKyoceraAcknowledgement.Visibility = ApprovedPlan?.RemovesOtherKyocera == true ? Visibility.Visible : Visibility.Collapsed;
+        OtherKyoceraAcknowledgement.IsEnabled = !busy && ApprovedPlan?.RemovesOtherKyocera == true;
+        RemoveButton.IsEnabled = CanConfirmRemoval;
     }
     internal void SetInventory(SelectiveQueue[] value)
     { inventory = value; RenderRows(); }
     private void RenderRows()
     {
         InvalidatePlan(); rows.Children.Clear(); QueueChoices.Clear();
-        foreach (var q in inventory.Where(q => q.Associated || ShowOthers.IsChecked == true))
+        foreach (var q in inventory.Where(q => q.Associated || q.CanSelect || ShowOthers.IsChecked == true))
         {
             var label = new TextBlock { Text = $"{q.Name}\nDriver: {q.DriverName}   Porta: {q.PortName}\nIP/host: {(q.Address.Length > 0 ? q.Address : "non disponibile")}   Stato: {q.Status}\n{q.Association}" +
+                (q.IsDefault ? "\nPredefinita Windows" : "") +
                 (q.Protection.Length > 0 ? "\nProtetta: " + q.Protection : "") + "\nID Windows: " + (q.QueueId.Length > 0 ? q.QueueId : "non disponibile"), TextWrapping = TextWrapping.Wrap };
             var choice = new CheckBox { Content = label, Tag = q, IsChecked = false, IsEnabled = q.CanSelect, Margin = new(8) };
             choice.Checked += (_, _) => InvalidatePlan(); choice.Unchecked += (_, _) => InvalidatePlan();
             QueueChoices.Add(choice);
             rows.Children.Add(new Border { Child = choice, Background = q.Associated ? new SolidColorBrush(Color.FromRgb(232, 243, 255)) : Brushes.White, Margin = new(0, 0, 0, 8), CornerRadius = new(5) });
         }
-        if (rows.Children.Count == 0) rows.Children.Add(new TextBlock { Text = "Nessuna coda ISAFOM rilevata. Puoi visualizzare le altre stampanti o aggiornare l’elenco.", TextWrapping = TextWrapping.Wrap });
+        if (rows.Children.Count == 0) rows.Children.Add(new TextBlock { Text = "Nessuna coda ISAFOM o Kyocera selezionabile rilevata. Puoi visualizzare le altre stampanti o aggiornare l’elenco.", TextWrapping = TextWrapping.Wrap });
         UpdateActions();
     }
     internal async Task RefreshAsync()

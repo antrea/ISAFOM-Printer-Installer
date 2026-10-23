@@ -49,14 +49,16 @@ function Get-IsafomSelectiveInventory($s,[string]$OwnerSid) {
         $owned=Test-IsafomManagedQueue $name $comment $marker
         $target=$tcp.Count -eq 1 -and (Test-IsafomTarget $s $tcp[0].HostAddress)
         $associated=$owned -or ($driver -ceq $s.DriverName -and $target)
-        $association=if($owned){'ISAFOM'}elseif($associated){'ISAFOM: duplicata/manuale o incompleta'}else{'Altra stampante'}
+        # A wrong/missing port must not make a local Kyocera queue impossible
+        # to select. Keep uncertain association visible; do not claim ownership.
+        $kyocera=$driver -match '^Kyocera(?:\s|$)'
+        $association=if($owned){'ISAFOM'}elseif($associated){'ISAFOM: duplicata/manuale o incompleta'}elseif($kyocera){'Altra Kyocera — associazione ISAFOM non verificata'}else{'Altra stampante'}
         if($comment -ceq ($marker+' pending') -or $q.Count -eq 0){$association+=' — incompleta'}
         $default=Test-IsafomOriginalDefault $OwnerSid $name
         $protection=''
-        if(-not $associated -or $driver -match '^(Microsoft |Remote Desktop |OneNote|Fax\b)' -or $port -match '^(TS[0-9]+|PORTPROMPT:|nul:)$'){$protection='Stampante non pertinente o di sistema'}
+        if((-not $associated -and -not $kyocera) -or $driver -match '^(Microsoft |Remote Desktop |OneNote|Fax\b)' -or $port -match '^(TS[0-9]+|PORTPROMPT:|nul:)$'){$protection='Stampante non pertinente o di sistema'}
         elseif(-not $local){$protection='Connessione remota protetta'}
         elseif($shared){$protection='Coda condivisa con altri utenti'}
-        elseif($default){$protection='Stampante predefinita protetta'}
         elseif(($comment -match '^CNR-ISAFOM Printer Installer' -or $comment -ceq 'Autore: Andrea Esposito - andrea.esposito@cnr.it') -and -not $owned){$protection='Installazione di un altro utente o proprietà non verificata'}
         elseif(-not $id -or $q.Count -gt 1 -or $r.Count -ne 1){$protection='Identità Windows non univoca o non disponibile'}
         elseif($q.Count -eq 1 -and ($r[0].DriverName -cne $driver -or $r[0].PortName -cne $port)){$protection='Inventario incoerente: aggiornare'}
@@ -172,6 +174,12 @@ function Remove-IsafomSelectiveQueue($Row,[string]$OwnerSid) {
     Remove-IsafomSelectiveQueueNative $Row $OwnerSid
 }
 
+function Assert-IsafomSelectiveDefault($Row,[string]$OwnerSid) {
+    # A default queue is removable only when that status was part of the
+    # reviewed fingerprint. A later default change requires a new review.
+    if([bool](Test-IsafomOriginalDefault $OwnerSid $Row.Name) -ne [bool]$Row.IsDefault){throw 'RemovalChanged'}
+}
+
 function Remove-IsafomSelectiveQueueNative($Row,[string]$OwnerSid) {
     # Targeted recovery for a damaged PrintManagement registration. OpenPrinter
     # binds a handle; recheck the GUID while that handle is held before Delete.
@@ -213,7 +221,7 @@ public static class IsafomSelectiveNative {
     try {
         $r=@(Get-IsafomQueueRegistry|Where-Object Name -CEQ $Row.Name)
         if($r.Count -ne 1 -or ([guid]$r[0].QueueId).ToString('D') -cne $Row.QueueId -or $r[0].DriverName -cne $Row.DriverName -or $r[0].PortName -cne $Row.PortName -or $r[0].Comment -cne $Row.IdentityComment){throw 'RemovalChanged'}
-        if(Test-IsafomOriginalDefault $OwnerSid $Row.Name){throw 'RemovalBlocked'}
+        Assert-IsafomSelectiveDefault $Row $OwnerSid
         if(-not [IsafomSelectiveNative]::EmptyAndMatching($handle,$Row.Name,$Row.DriverName,$Row.PortName,$Row.IdentityComment)){throw 'RemovalBlocked'}
         if(-not [IsafomSelectiveNative]::DeletePrinter($handle)){throw 'RemovalBlocked'}
     } finally {$null=[IsafomSelectiveNative]::ClosePrinter($handle)}
@@ -229,7 +237,9 @@ function Invoke-IsafomSelectiveRemoval($s,[string]$OwnerSid,[string[]]$QueueIds,
     $plan=Get-IsafomSelectivePlan $s $OwnerSid $QueueIds
     if($plan.Fingerprint -cne $Fingerprint){throw 'RemovalChanged'}
     $results=@();$resourceErrors=@{}
-    foreach($approved in $plan.Queues) {
+    # Delete the selected default last, so Windows cannot promote another
+    # selected queue to default halfway through an otherwise approved batch.
+    foreach($approved in @($plan.Queues|Sort-Object IsDefault,QueueId)) {
         $removed=$false;$details='';$residuals=@()
         try {
             $rows=@(Get-IsafomSelectiveInventory $s $OwnerSid)

@@ -44,7 +44,7 @@ Una registrazione differente produce `DriverConflict`. Il programma non aggiorna
 
 ## Rimozione completa e forzata
 
-La modalità ordinaria lavora sulla stampante prevista e blocca dipendenze condivise. Quella forzata è **selettiva**: checkbox inizialmente vuote, inventario aggiornabile e conferma di un piano con le sole code selezionate. Le dipendenze condivise sono conservate e non estendono il piano ad altre code o modelli. Stampante predefinita, code condivise/remotamente connesse, stampanti di sistema e non pertinenti restano protette.
+La modalità ordinaria lavora sulla stampante prevista e blocca dipendenze condivise. Quella forzata è **selettiva**: checkbox inizialmente vuote, inventario aggiornabile e conferma di un piano con una o più code selezionate. Sono selezionabili anche Kyocera locali con configurazione incompleta o porta errata. L'associazione ISAFOM non verificata viene segnalata e richiede una conferma dedicata. La predefinita è selezionabile con un'altra conferma dedicata; Windows potrà sceglierne una sostitutiva dopo la rimozione, senza che l'app la imposti. Le dipendenze condivise sono conservate e non estendono il piano ad altre code o modelli. Code condivise/remotamente connesse, stampanti di sistema, non pertinenti e con identità non verificabile restano protette.
 
 Il GUID Windows `QueueInstanceId`, insieme alla configurazione, distingue ogni istanza anche in presenza di copie o nomi riutilizzati. Senza un'identità univoca l'applicazione protegge la voce. Le registrazioni incomplete identificabili vengono mostrate; il backend usa handle Winspool e un recupero limitato alla stessa istanza. L'helper elevato ricalcola il piano e rifiuta una conferma divenuta obsoleta.
 

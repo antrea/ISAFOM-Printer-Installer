@@ -2,9 +2,11 @@
 
 In **Debug e verifica** sono disponibili **Rimuovi completamente…** e **Rimozione forzata selettiva…**. La seconda modalità permette di scegliere esplicitamente una o più code ISAFOM, comprese copie e installazioni incomplete, conservando le risorse necessarie alle altre stampanti.
 
-L'inventario è aggiornabile e indica nome, driver, porta, IP/host e stato. Le checkbox sono inizialmente vuote. Stampante predefinita, code condivise/remotamente connesse, stampanti di sistema, non pertinenti e con identità ambigua sono protette. Il GUID di istanza Windows distingue copie e code ricreate con lo stesso nome.
+L'inventario è aggiornabile e indica nome, driver, porta, IP/host, stato e se la coda è predefinita. Le checkbox sono inizialmente vuote e permettono la selezione multipla. Sono selezionabili anche altre Kyocera locali, comprese quelle con porta errata o mancante, senza confonderle con quelle associate a ISAFOM. Code condivise/remotamente connesse, stampanti di sistema, non pertinenti e con identità ambigua sono protette. Il GUID di istanza Windows distingue copie e code ricreate con lo stesso nome.
 
 Aprire **Rimozione forzata selettiva…**, selezionare le code, premere **Controlla selezione…**, leggere il riepilogo, spuntare la conferma e premere **Rimuovi le code confermate**. Ogni cambio di selezione o aggiornamento invalida la conferma. L'helper UAC ricalcola il piano prima di modificare il PC.
+
+La predefinita può essere rimossa con una conferma dedicata: Windows potrà scegliere un'altra predefinita. Anche le Kyocera non riconosciute come ISAFOM richiedono una conferma dedicata. Ogni conferma parte vuota e riguarda esclusivamente le code nel riepilogo. Porte e risorse di provenienza non dimostrata restano conservate.
 
 ## Porte e residui
 

@@ -28,7 +28,7 @@ Tool Windows in italiano per configurare la **Kyocera TASKalfa 3554ci KX** della
 - Nome fino a 31 caratteri; Account ID di **quattro cifre**, mantenendo gli zeri iniziali. Il limite comune di quattro cifre è quello della stampa privata nel driver collaudato.
 - Riutilizza il driver della versione corretta: ripetere l'installazione aggiorna Nome e ID senza reinstallarlo.
 - Log scorrevole nella schermata principale, roadmap in cinque fasi, verifica finale e scheda tecnica.
-- Rimozione ordinaria o forzata selettiva: elenco aggiornabile, checkbox vuote, conferma delle sole code scelte, protezione della predefinita e conservazione delle risorse condivise; esiti individuali con residui.
+- Rimozione ordinaria o forzata selettiva: elenco aggiornabile, checkbox vuote e rimozione di più code scelte, anche Kyocera configurate male o predefinite, con conferme dedicate e conservazione delle risorse condivise; esiti individuali con residui.
 - Nessuna stampa di prova automatica e nessuna modifica esplicita della stampante predefinita.
 
 ## Ottenere il programma

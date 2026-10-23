@@ -138,9 +138,11 @@ internal static class GuiChecks
             var confirmationPng=new PngBitmapEncoder();confirmationPng.Frames.Add(BitmapFrame.Create(confirmationBitmap));
             using(var confirmationFile=File.Create(Path.Combine(output,"Disinstallazione_Anteprima_025.png")))confirmationPng.Save(confirmationFile);
             confirmation.Close();
-            var forceConfirmation=new SelectiveRemovalWindow(()=>Task.FromResult(SelectiveRemovalChecks.Inventory),
-                ids=>Task.FromResult(SelectiveRemovalChecks.Plan(ids)));
-            forceConfirmation.SetInventory(SelectiveRemovalChecks.Inventory);
+            var forceInventory=SelectiveRemovalChecks.Inventory;
+            forceInventory[1]=forceInventory[1] with { Associated=false, Association="Altra Kyocera — associazione ISAFOM non verificata", PortName="Porta errata" };
+            var forceConfirmation=new SelectiveRemovalWindow(()=>Task.FromResult(forceInventory),
+                ids=>Task.FromResult(new SelectiveRemovalPlan(forceInventory.Where(q=>ids.Contains(q.QueueId)).ToArray(),[],[],[],[],new string('F',64))));
+            forceConfirmation.SetInventory(forceInventory);
             var forceRoot=(FrameworkElement)forceConfirmation.Content;forceConfirmation.Content=null;
             System.Windows.Documents.TextElement.SetFontFamily(forceRoot,forceConfirmation.FontFamily);
             System.Windows.Documents.TextElement.SetFontSize(forceRoot,forceConfirmation.FontSize);
@@ -150,6 +152,14 @@ internal static class GuiChecks
             var forceBitmap=new RenderTargetBitmap(660,620,96,96,PixelFormats.Pbgra32);forceBitmap.Render(forceRoot);
             var forcePng=new PngBitmapEncoder();forcePng.Frames.Add(BitmapFrame.Create(forceBitmap));
             using(var forceFile=File.Create(Path.Combine(output,"Disinstallazione_Forzata_027.png")))forcePng.Save(forceFile);
+            forceConfirmation.QueueChoices[1].IsChecked=true;forceConfirmation.QueueChoices[2].IsChecked=true;
+            forceConfirmation.ReviewAsync().GetAwaiter().GetResult();
+            forceRoot.Measure(new(660,620));forceRoot.Arrange(new Rect(0,0,660,620));forceRoot.UpdateLayout();
+            ((DockPanel)forceRoot).Children.OfType<ScrollViewer>().Single().ScrollToBottom();Pump();forceRoot.UpdateLayout();
+            Check(Unclipped(forceConfirmation.Acknowledgement,forceRoot)&&Unclipped(forceConfirmation.DefaultAcknowledgement,forceRoot)&&Unclipped(forceConfirmation.OtherKyoceraAcknowledgement,forceRoot)&&Unclipped(forceConfirmation.RemoveButton,forceRoot)&&!forceConfirmation.RemoveButton.IsEnabled,"Multiple queue review keeps all dedicated confirmations reachable by scrolling and actions visible");
+            var batchBitmap=new RenderTargetBitmap(660,620,96,96,PixelFormats.Pbgra32);batchBitmap.Render(forceRoot);
+            var batchPng=new PngBitmapEncoder();batchPng.Frames.Add(BitmapFrame.Create(batchBitmap));
+            using(var batchFile=File.Create(Path.Combine(output,"Disinstallazione_SelezioneMultipla_027.png")))batchPng.Save(batchFile);
             forceConfirmation.Close();
             window.RootScroll.ScrollToHome();Pump();
             window.UserName.Text="  ";window.Account.Password="0073";

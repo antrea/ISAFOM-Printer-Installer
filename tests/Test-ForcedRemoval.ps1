@@ -142,9 +142,61 @@ Check (-not (@(Get-IsafomSelectiveInventory $s $owner|Where-Object Name -CEQ 'Pr
 
 Reset-SelectiveCase
 $script:DefaultName='Printer 1'
-Refused {Approve @(0)}
 $rows=@(Get-IsafomSelectiveInventory $s $owner)
-Check (-not $rows[0].CanSelect -and -not $rows[3].CanSelect -and -not $rows[4].CanSelect) 'Default, unrelated and system queues are protected even in direct backend requests'
+Check ($rows[0].CanSelect -and $rows[0].IsDefault -and -not $rows[3].CanSelect -and -not $rows[4].CanSelect) 'Associated default queue is selectable; unrelated and system queues remain protected'
+$before=ConvertTo-Json -InputObject @($script:Queues|Select-Object -Skip 2) -Compress
+$plan=Approve
+Check (@($plan.Queues|Where-Object IsDefault).Count -eq 1) 'Reviewed fingerprint explicitly includes selected default printer status'
+$null=Assert-IsafomSelectiveDefault $rows[0] $owner
+$result=Execute $plan
+Check ($script:Queues.Count -eq 3 -and (ConvertTo-Json -InputObject $script:Queues -Compress) -ceq $before -and $script:Ports.Name -contains 'IP_1' -and $script:Drivers.Count -eq 1 -and @($result.SelectiveRemoval|Where-Object Outcome -CNE 'Rimossa completamente').Count -eq 0) 'Selected default and second queue are removed; all three excluded queues and shared resources remain intact'
+
+Reset-SelectiveCase
+$script:DefaultName='Printer 1'
+$script:AfterDelete={if(@($script:Queues|Where-Object Name -CEQ $script:DefaultName).Count -eq 0){$script:DefaultName=$script:Queues[0].Name}}
+$result=Execute (Approve)
+Check ($script:Writes[0] -ceq 'Queue:00000000-0000-0000-0000-000000000002' -and $script:Queues.Count -eq 3 -and @($result.SelectiveRemoval|Where-Object Outcome -CNE 'Rimossa completamente').Count -eq 0) 'Selected default is deleted last so Windows automatic reassignment cannot block another selected queue'
+
+Reset-SelectiveCase
+$plan=Approve @(0);$script:DefaultName='Printer 1'
+Refused {Execute $plan}
+Check ($script:Writes.Count -eq 0) 'Becoming default after review invalidates a plan without default acknowledgement'
+
+Reset-SelectiveCase
+$script:DefaultName='Printer 1';$plan=Approve @(0);$script:DefaultName='Printer 5'
+Refused {Execute $plan}
+Check ($script:Writes.Count -eq 0) 'Changing away from the reviewed default status also requires a fresh review'
+
+Reset-SelectiveCase
+$row=@(Get-IsafomSelectiveInventory $s $owner|Where-Object Name -CEQ 'Printer 1')[0]
+$script:DefaultName='Printer 1'
+Refused {Assert-IsafomSelectiveDefault $row $owner}
+Check ($script:Writes.Count -eq 0) 'Native handle guard rejects a default change after the final inventory check'
+
+Reset-SelectiveCase
+$script:DefaultName='Printer 4';Refused {Approve @(3)}
+$script:DefaultName='Printer 5';Refused {Approve @(4)}
+Check ($script:Writes.Count -eq 0) 'Default status never makes unrelated or system queues eligible for removal'
+
+Reset-SelectiveCase
+$script:Queues[0].Comment='';$script:Queues[0].PortName='Wrong_port';$script:DefaultName='Printer 1'
+$script:Queues[1].Comment='';$script:Queues[1].PortName='Missing_port';$script:Queues[1].DriverName='Kyocera ECOSYS M5526cdw KX'
+$rows=@(Get-IsafomSelectiveInventory $s $owner)
+Check ($rows[0].CanSelect -and $rows[1].CanSelect -and -not $rows[0].Associated -and -not $rows[1].Associated) 'Multiple local Kyocera models with wrong or missing ports are selectable without claiming ISAFOM ownership'
+$before=ConvertTo-Json -InputObject @($script:Queues|Select-Object -Skip 2) -Compress
+$plan=Approve;$result=Execute $plan
+Check ($script:Queues.Count -eq 3 -and (ConvertTo-Json -InputObject $script:Queues -Compress) -ceq $before -and @($result.SelectiveRemoval|Where-Object Outcome -CEQ 'Non rimossa').Count -eq 0) 'Batch removal of two misconfigured Kyocera queues includes the selected default and leaves three excluded queues identical'
+Check (@($script:Writes|Where-Object {$_ -notlike 'Queue:*'}).Count -eq 0 -and $script:Drivers.Count -eq 1 -and $script:Ports.Count -eq 5) 'Unknown ports and other-model driver resources are retained during misconfigured Kyocera batch removal'
+
+Reset-SelectiveCase
+$script:Queues[0].Comment='';$script:Queues[0].PortName='Missing_port';$script:MissingProvider='Printer 1'
+$result=Execute (Approve @(0))
+Check ($script:NativeCalls -eq 1 -and $script:Queues.Count -eq 4 -and $result.SelectiveRemoval[0].Outcome -cne 'Non rimossa') 'A manual Kyocera with damaged provider registration and missing port receives targeted recovery'
+
+Reset-SelectiveCase
+$script:Queues[0].Comment='';$script:Queues[0].DriverName='';$script:Queues[0].PortName=''
+Refused {Approve @(0)}
+Check ($script:Writes.Count -eq 0) 'Unidentifiable corrupt queues without installer ownership or a Kyocera driver remain protected'
 
 Reset-SelectiveCase
 $script:Queues[0].Shared=$true;Refused {Approve @(0)}

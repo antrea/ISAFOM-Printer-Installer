@@ -1,5 +1,11 @@
 # Validazione — 0.2.7-rc1
 
+## Rimozione della predefinita e di più Kyocera — 23 ottobre 2026
+
+La rimozione selettiva consente ora di spuntare anche la predefinita e più Kyocera locali con porta errata o mancante. Le code non riconosciute come ISAFOM sono indicate senza attribuire loro una proprietà non verificata. Predefinita e associazione non verificata richiedono conferme dedicate, invalidate insieme al riepilogo quando cambia la selezione. La predefinita viene rimossa per ultima, senza impostarne una sostitutiva. Identità, lavori e dipendenze restano ricontrollati prima delle operazioni.
+
+L'[evidenza di questa revisione](validation-evidence/selective-default-batch-20261023.json) registra la build completa con entrambi i payload ufficiali verificati: 84 controlli Core, 17 Windows/UI/privacy, 76 installer (inclusi 23 di selezione/conferma/protocollo), 123 GUI/DPI, 17 identità e 4 catalogo. I **51 test selettivi** passano con PowerShell 7 e Windows PowerShell 5.1; i 31 test ordinari passano nella build completa. Le regressioni includono due Kyocera configurate male su cinque, rimozione della predefinita selezionata per ultima, riassegnazione automatica simulata di Windows e protezione delle tre code escluse. L'inventario incorporato reale mantiene invariati code, porte e predefinite del profilo e della sessione desktop remoto. La cancellazione nativa su stampanti reali resta da collaudare; i mutatori dei test sono simulati.
+
 ## Audit della revisione selettiva — 23 ottobre 2026
 
 Il codice attuale sostituisce la precedente espansione transitiva della rimozione forzata con la selezione esplicita delle istanze Windows. L'[evidenza filtrata](validation-evidence/selective-removal-20261023.json) riguarda questi sorgenti, compilati con SDK 10.0.402 senza archivi proprietari. Il manifest delle risorse identifica i file della revisione; gli hash degli EXE storici riportati sotto non identificano questa build di test.

@@ -8,6 +8,8 @@ Aprire **Rimozione forzata selettiva…**, selezionare le code, premere **Contro
 
 La predefinita può essere rimossa con una conferma dedicata: Windows potrà scegliere un'altra predefinita. Anche le Kyocera non riconosciute come ISAFOM richiedono una conferma dedicata. Ogni conferma parte vuota e riguarda esclusivamente le code nel riepilogo. Porte e risorse di provenienza non dimostrata restano conservate.
 
+Sono ora selezionabili anche code di altre marche con porta, IP/host o driver in comune con ISAFOM/Kyocera e code con configurazione incompleta. Ogni riga e il riepilogo ne indicano i motivi. Le code senza tali criteri restano in grigio. La conferma di appartenenza non verificata si applica a tutte queste code. I collegamenti non comportano preselezioni o estensione del piano ad altre stampanti e non superano le protezioni per sistema, code condivise, remote, altri utenti o identità ambigue.
+
 ## Porte e residui
 
 Sono candidabili solo le porte TCP/IP dedicate alle code selezionate e riconducibili all'endpoint ISAFOM. Porte condivise, WSD e porte esterne alla selezione restano conservate. Le dipendenze vengono ricontrollate prima delle operazioni e possono soltanto ridurre la pulizia prevista.

@@ -21,10 +21,11 @@ function Reset-SelectiveCase {
     $script:Queues[3].DriverName='HP';$script:Queues[3].Comment=''
     $script:Queues[4].DriverName='Microsoft Print to PDF';$script:Queues[4].Comment=''
     $script:Ports=@(1..5|ForEach-Object {[pscustomobject]@{Name=('IP_'+$_);HostAddress=$s.FallbackIPv4;Protocol=1;PortNumber=9100}})
+    $script:Ports[3].HostAddress='192.0.2.44'
     $script:Drivers=@([pscustomobject]@{Name=$s.DriverName;PrinterEnvironment='Windows x64';InfPath='';DriverVersion=1})
     $script:Writes=@();$script:Busy='';$script:JobFailure=$false;$script:FailQueue='';$script:NoopQueue='';$script:FailPort='';$script:FailDriver=$false
     $script:DefaultName='Printer 5';$script:NativeCalls=0;$script:AfterDelete=$null;$script:InventoryFailure=$false;$script:PackageExists=$false;$script:PackageRestart=$false
-    $script:MissingIdentity='';$script:DuplicateRegistry=$false;$script:MissingProvider='';$script:BoundDevices=@();$script:DriverReadFails=$false
+    $script:MissingIdentity='';$script:DuplicateRegistry=$false;$script:MissingProvider='';$script:BoundDevices=@();$script:DriverReadFails=$false;$script:PortReadFails=$false;$script:MissingDriver=''
 }
 function Get-Service {param($Name,$ErrorAction) [pscustomobject]@{Status='Running'}}
 function Get-Printer {param($ErrorAction) if($script:InventoryFailure){throw 'InventoryFailure'};$script:Queues|Where-Object Name -CNE $script:MissingProvider}
@@ -36,6 +37,11 @@ function Get-IsafomQueueRegistry {
 }
 function Get-CimInstance {param($ClassName,$ErrorAction) if($ClassName -cne 'Win32_TCPIPPrinterPort'){throw 'UnexpectedQuery'};$script:Ports}
 function Get-PrinterDriver {param($ErrorAction) if($script:DriverReadFails){throw 'DriverProviderFailure'};$script:Drivers}
+function Get-PrinterPort {param($ErrorAction) if($script:PortReadFails){throw 'PortProviderFailure'};$script:Ports}
+function Get-IsafomSelectiveDriverNames {
+    if($script:DriverReadFails){throw 'DriverProviderFailure'}
+    @(@($script:Drivers|ForEach-Object Name)+@('HP','Microsoft Print to PDF','Kyocera ECOSYS M5526cdw KX','Universal wrong driver','Epson','Brother','Unrecognized driver')|Where-Object {$_ -cne $script:MissingDriver})
+}
 function Test-IsafomOriginalDefault {param($OwnerSid,$QueueName) $QueueName -ceq $script:DefaultName}
 function Test-IsafomManagedQueue {param($name,$comment,$marker) Test-IsafomQueueIdentity $comment $null $marker}
 function Get-PrintJob {param($PrinterName,$ErrorAction) if($script:JobFailure){throw 'AccessDenied'};if($PrinterName -ceq $script:Busy){[pscustomobject]@{Id=1}}}
@@ -195,8 +201,8 @@ Check ($script:NativeCalls -eq 1 -and $script:Queues.Count -eq 4 -and $result.Se
 
 Reset-SelectiveCase
 $script:Queues[0].Comment='';$script:Queues[0].DriverName='';$script:Queues[0].PortName=''
-Refused {Approve @(0)}
-Check ($script:Writes.Count -eq 0) 'Unidentifiable corrupt queues without installer ownership or a Kyocera driver remain protected'
+$rows=@(Get-IsafomSelectiveInventory $s $owner);$result=Execute (Approve @(0))
+Check ($rows[0].CanSelect -and $rows[0].Reasons -contains 'Configurazione incompleta' -and -not $rows[0].Associated -and $script:Queues.Count -eq 4) 'Identifiable incomplete configuration is selectable without claiming Kyocera or ISAFOM ownership'
 
 Reset-SelectiveCase
 $script:Queues[0].Shared=$true;Refused {Approve @(0)}
@@ -274,6 +280,104 @@ Reset-SelectiveCase
 $staleProvider=$script:Queues[0].PSObject.Copy();$staleProvider.QueueId=''
 $plan=Approve @(0);$script:AfterDelete={$script:Queues+=@($staleProvider)};$result=Execute $plan
 Check ($result.SelectiveRemoval[0].Outcome -ceq 'Non rimossa' -and $script:Writes.Count -eq 1) 'A provider queue persisting without registry identity never counts as successful removal'
+
+Reset-SelectiveCase
+$script:Queues[3].PortName='ip_1'
+$rows=@(Get-IsafomSelectiveInventory $s $owner)
+Check ($rows[3].CanSelect -and -not $rows[3].Associated -and $rows[3].Reasons -contains 'Stessa porta della Kyocera') 'Another brand sharing the Kyocera port is selectable case-insensitively with an explicit reason'
+$before=ConvertTo-Json -InputObject @($script:Queues|Where-Object Name -CNE 'Printer 4') -Compress
+$result=Execute (Approve @(3))
+Check ($script:Queues.Count -eq 4 -and (ConvertTo-Json -InputObject $script:Queues -Compress) -ceq $before -and $script:Ports.Name -contains 'IP_1' -and $script:Drivers.Count -eq 1) 'Removing a wrong-brand queue alone preserves the Kyocera, shared port, driver and all excluded queues'
+
+Reset-SelectiveCase
+$script:Ports[3].HostAddress=$s.FallbackIPv4;$script:Queues[3].PrinterStatus='Offline'
+$rows=@(Get-IsafomSelectiveInventory $s $owner)
+Check ($rows[3].CanSelect -and $rows[3].Reasons -contains 'Stesso IP/host della Kyocera' -and $rows[3].Reasons -notcontains 'Stessa porta della Kyocera') 'Another brand on a distinct port but the same IP is selectable even offline'
+
+Reset-SelectiveCase
+$script:Queues[0].DriverName='Universal wrong driver';$script:Queues[3].DriverName='Universal wrong driver'
+$rows=@(Get-IsafomSelectiveInventory $s $owner)
+Check ($rows[3].CanSelect -and $rows[3].Reasons -contains 'Driver condiviso con la Kyocera') 'Sharing the driver of an installer-owned queue is sufficient even for a misnamed driver'
+
+Reset-SelectiveCase
+$script:Queues[3].PortName='Missing_port'
+$rows=@(Get-IsafomSelectiveInventory $s $owner)
+Check ($rows[3].CanSelect -and $rows[3].Reasons -contains 'Configurazione incompleta') 'A known missing port makes an identifiable incomplete queue selectable'
+
+Reset-SelectiveCase
+$script:MissingProvider='Printer 4'
+$rows=@(Get-IsafomSelectiveInventory $s $owner);$result=Execute (Approve @(3))
+Check ($rows[3].CanSelect -and $rows[3].Reasons -contains 'Configurazione incompleta' -and $script:NativeCalls -eq 1 -and $script:Queues.Count -eq 4) 'A registry-only incomplete queue of another brand remains selectable and receives targeted recovery'
+
+Reset-SelectiveCase
+$script:PortReadFails=$true
+$rows=@(Get-IsafomSelectiveInventory $s $owner)
+Check (-not $rows[3].CanSelect -and $rows[3].Reasons -notcontains 'Configurazione incompleta') 'An unreadable port inventory does not falsely label healthy unrelated printers as incomplete'
+
+Reset-SelectiveCase
+$script:MissingDriver='HP'
+$rows=@(Get-IsafomSelectiveInventory $s $owner)
+Check ($rows[3].CanSelect -and $rows[3].Reasons -contains 'Configurazione incompleta') 'A queue referencing a missing driver registration is selectable as incomplete'
+
+Reset-SelectiveCase
+$script:DriverReadFails=$true
+$rows=@(Get-IsafomSelectiveInventory $s $owner)
+Check (-not $rows[3].CanSelect -and $rows[3].Reasons -notcontains 'Configurazione incompleta') 'An unreadable driver inventory does not falsely classify healthy unrelated printers as incomplete'
+
+Reset-SelectiveCase
+$rows=@(Get-IsafomSelectiveInventory $s $owner)
+Check (-not $rows[3].CanSelect -and $rows[3].Reasons.Count -eq 0 -and $rows[3].Protection -like 'Nessun collegamento*') 'Healthy unrelated printers remain grey and cannot be selected through the backend'
+Refused {Approve @(3)}
+
+Reset-SelectiveCase
+$script:Queues[3].PortName='Other, ip_1';$script:Ports+=@([pscustomobject]@{Name='Other';HostAddress='192.0.2.99';Protocol=1;PortNumber=9100})
+$rows=@(Get-IsafomSelectiveInventory $s $owner)
+Check ($rows[3].CanSelect -and $rows[3].Reasons -contains 'Stessa porta della Kyocera' -and $rows[3].Reasons -notcontains 'Configurazione incompleta') 'Pooled ports are matched individually without inventing an incomplete configuration'
+
+Reset-SelectiveCase
+$script:Ports[0].HostAddress='2001:db8::1';$script:Ports[3].HostAddress='2001:0DB8:0:0:0:0:0:1'
+$rows=@(Get-IsafomSelectiveInventory $s $owner)
+Check ($rows[3].CanSelect -and $rows[3].Reasons -contains 'Stesso IP/host della Kyocera') 'Equivalent IPv6 addresses match without a network lookup'
+
+Reset-SelectiveCase
+$script:Queues[3].PortName='IP_1';$script:Queues[1].Comment='';$script:Queues[1].DriverName='HP';$script:Ports[1].HostAddress='192.0.2.102'
+$rows=@(Get-IsafomSelectiveInventory $s $owner)
+Check ($rows[3].CanSelect -and -not $rows[1].CanSelect) 'A newly related HP queue cannot transitively authorize another HP queue through its driver'
+
+Reset-SelectiveCase
+$script:Ports[3].HostAddress=$s.FallbackIPv4;$plan=Approve @(3);$script:Ports[3].HostAddress='192.0.2.44'
+Refused {Execute $plan}
+Check ($script:Writes.Count -eq 0) 'Losing the relationship before execution invalidates the reviewed fingerprint'
+
+Reset-SelectiveCase
+$script:Queues[1].Comment='';$script:Queues[1].DriverName='Epson';$script:Ports[1].HostAddress='192.0.2.102'
+$script:Queues[2].Comment='';$script:Queues[2].DriverName='Brother';$script:Queues[2].PortName='IP_3';$script:Ports[2].HostAddress='192.0.2.103'
+$script:Ports[0].HostAddress='192.0.2.90';$script:Ports[3].HostAddress='192.0.2.90';$script:DefaultName='Printer 4'
+$before=ConvertTo-Json -InputObject @($script:Queues|Where-Object {$_.Name -notin @('Printer 1','Printer 4')}) -Compress
+$result=Execute (Approve @(0,3))
+Check ($script:Queues.Count -eq 3 -and @($result.SelectiveRemoval|Where-Object Outcome -CEQ 'Non rimossa').Count -eq 0 -and (ConvertTo-Json -InputObject $script:Queues -Compress) -ceq $before) 'Removing the sole Kyocera reference first does not block its unchanged selected related default; three excluded queues stay identical'
+
+Reset-SelectiveCase
+$script:Ports[3].HostAddress=$s.FallbackIPv4;$plan=Approve @(0,3)
+$script:AfterDelete={$script:Ports[3].HostAddress='192.0.2.44'}
+$result=Execute $plan
+Check (@($result.SelectiveRemoval|Where-Object {$_.Name -ceq 'Printer 4' -and $_.Outcome -ceq 'Non rimossa'}).Count -eq 1 -and @($script:Queues|Where-Object Name -CEQ 'Printer 4').Count -eq 1) 'A selected queue whose port is reassigned to another IP mid-batch is not removed under stale consent'
+
+Reset-SelectiveCase
+$row=@(Get-IsafomSelectiveInventory $s $owner)[0];$null=Assert-IsafomSelectiveEndpoint $row
+$script:Ports[0].HostAddress='192.0.2.91'
+Refused {Assert-IsafomSelectiveEndpoint $row}
+Check ($script:Writes.Count -eq 0) 'Native handle guard rejects a TCP/IP endpoint changed after the inventory read'
+
+Reset-SelectiveCase
+$script:Queues[3].PortName='IP_1';$script:Queues[3].Shared=$true
+$rows=@(Get-IsafomSelectiveInventory $s $owner)
+Check (-not $rows[3].CanSelect -and $rows[3].Reasons -contains 'Stessa porta della Kyocera' -and $rows[3].Protection -like '*condivisa*') 'A relation is explained but cannot bypass protection of a queue shared with other users'
+
+Reset-SelectiveCase
+$script:Queues[4].PortName='IP_1';$script:MissingIdentity='Printer 4';$script:Queues[3].PortName=''
+$rows=@(Get-IsafomSelectiveInventory $s $owner)
+Check (-not $rows[4].CanSelect -and -not $rows[3].CanSelect -and $rows[4].Reasons -contains 'Stessa porta della Kyocera' -and $rows[3].Reasons -contains 'Configurazione incompleta') 'System printers and queues without unique identity stay protected even when a relationship or incomplete configuration exists'
 
 # Local byte fixtures only; file/driver mutators remain mocked. No spool path is written.
 $fixture=[IO.Path]::GetTempFileName()

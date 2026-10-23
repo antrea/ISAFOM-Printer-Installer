@@ -1,0 +1,52 @@
+{
+  "SchemaVersion": 1,
+  "DateLocal": "2026-10-23",
+  "Timezone": "Europe/Rome",
+  "BaseCommit": "4cb5cc1584c08e2979255f659ba13247179bb171",
+  "Scope": "Explicit selection of ISAFOM/Kyocera, related queues of other brands and incomplete configurations; unrelated healthy queues disabled",
+  "Commands": [
+    "pwsh -NoProfile -File build/Build-Installer.ps1 -Dotnet <local SDK>",
+    "pwsh -NoProfile -File tests/Test-ForcedRemoval.ps1",
+    "powershell.exe -NoProfile -ExecutionPolicy Bypass -File tests/Test-ForcedRemoval.ps1"
+  ],
+  "Sdk": "10.0.402",
+  "BuildWarnings": 0,
+  "BuildErrors": 0,
+  "Passed": {
+    "Core": 84,
+    "WindowsUiPrivacy": 17,
+    "Installer": 78,
+    "SelectiveUiProtocolIncludedInInstaller": 25,
+    "GuiDpi": 123,
+    "BackendIdentity": 17,
+    "CatalogTrust": 4,
+    "OrdinaryRemoval": 31,
+    "FinalSelectiveRemovalPerEngine": 70,
+    "EmbeddedReadOnlySelectiveInventory": true
+  },
+  "RemovalTestEngines": ["PowerShell 7", "Windows PowerShell 5.1"],
+  "Acceptance": {
+    "OtherBrandSamePortSelectable": true,
+    "OtherBrandSameEndpointSelectable": true,
+    "OtherBrandSharedDriverSelectable": true,
+    "IdentifiableIncompleteConfigurationSelectable": true,
+    "MissingDriverOrPortRegistrationDetected": true,
+    "UnreadableInventoryDoesNotProveIncompleteConfiguration": true,
+    "ReasonsVisibleWithoutClaimingIsafomOwnership": true,
+    "HealthyUnrelatedQueuesDisabled": true,
+    "NoTransitiveAssociationExpansion": true,
+    "NoPreselection": true,
+    "OnlyConfirmedQueueIdsRemoved": true,
+    "SharedResourcesAndExcludedQueuesPreserved": true,
+    "SelectedReferenceMayBeRemovedBeforeRelatedSelectedQueue": true,
+    "EndpointChangeMidBatchRejectsStaleConsent": true,
+    "EndpointRecheckedWhileNativeHandleIsOpen": true,
+    "UniqueIdentityAndSystemProtectionsRetained": true
+  },
+  "NetworkReachabilityOrDnsLookupRequired": false,
+  "BothOfficialDriverPayloadsValidated": true,
+  "DestructiveWindowsMutationsMocked": true,
+  "RealNativeRemovalExecuted": false,
+  "PhysicalPrintingPerformed": false,
+  "HostInventoryOrPersonalValuesIncluded": false
+}

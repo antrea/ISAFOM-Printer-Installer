@@ -44,6 +44,7 @@ try {
     Check ((Run-App @('--force-removal-preview-output',$forcePreview)) -eq 0) 'Published EXE reads selective force inventory without elevation or mutations'
     $forcePlan=@(Get-Content -LiteralPath $forcePreview -Raw|ConvertFrom-Json)
     Check (@($forcePlan|Where-Object {$null -ne $_.PSObject.Properties['AccountID'] -or $null -eq $_.PSObject.Properties['CanSelect']}).Count -eq 0) 'Force inventory exposes protection without selection or personal codes'
+    Check (@($forcePlan|Where-Object {$_.CanSelect -and (@($_.Reasons).Count -eq 0 -or $_.Protection.Length -gt 0)}).Count -eq 0) 'Every selectable queue has eligibility reasons and every protected queue stays disabled'
     $settings = Get-Content -LiteralPath (Join-Path $root 'config\printer-settings.json') -Raw
     Check ((Run-App @('--validate-config-stdin') $settings) -eq 0) 'Administrative settings validated in memory through stdin'
     Check ((Run-App @('--validate-config',(Join-Path $root 'config\printer-settings.json'))) -eq 0) 'Configuration validation file mode is read-only'

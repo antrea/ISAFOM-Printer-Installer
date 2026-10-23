@@ -89,8 +89,8 @@
     },
     {
       "Path": "docs/ARCHITETTURA.md",
-      "Bytes": 4329,
-      "Sha256": "B806D3B65FF9990BC20956609463402DFB98F932B28C4D6DA676F424E82A2919"
+      "Bytes": 5764,
+      "Sha256": "1521BA19EDC638B4CE394D38BEB290B770EB0D8AA41A43C78507A35D10EF98C9"
     },
     {
       "Path": "docs/DIAGNOSTICA.md",
@@ -99,13 +99,13 @@
     },
     {
       "Path": "docs/GUIDA_AMMINISTRATORE.md",
-      "Bytes": 6103,
-      "Sha256": "66702E52640AF9D99BB8431441D6ED8CC03E9D0C2E4988CC522970A0AA125D28"
+      "Bytes": 6789,
+      "Sha256": "14F62236D7200C2EE722D64AD53D8F2E4B6C966C0D1D031398C3EEAAA9E37785"
     },
     {
       "Path": "docs/GUIDA_UTENTE.md",
-      "Bytes": 5417,
-      "Sha256": "6F3B69AAD0B1E3F691BA75044A7E8735F4B887B5A489210D1BEE5B5C85CEFCED"
+      "Bytes": 6109,
+      "Sha256": "88F0DF0163AFBD8CF2939050D1D4C6B23496A9485631E747DB93921982A1CA78"
     },
     {
       "Path": "docs/images/installazione.png",
@@ -114,8 +114,8 @@
     },
     {
       "Path": "docs/INSTALLER_027_RC1.md",
-      "Bytes": 3320,
-      "Sha256": "272CB3343D72CDBA13333710216BDEBA10B1BDBD205671E6691E0A859180F749"
+      "Bytes": 3819,
+      "Sha256": "4695156D75D09BD9AFBE16596882B9F0F61F33B6634CBCCF720D5AF8F5E71200"
     },
     {
       "Path": "docs/licenses/DOTNET-LICENSE.txt",
@@ -174,8 +174,8 @@
     },
     {
       "Path": "README.md",
-      "Bytes": 4279,
-      "Sha256": "987F61545F989B8FA4B6BF89C3B3D3D0CB42D57DC6E3BA1722FD60EB7DF92761"
+      "Bytes": 4367,
+      "Sha256": "BB10DA7E4A1C330612D4EF2596A646A958F7F817511AB24B905DD10D9B4883B7"
     },
     {
       "Path": "research/reverse-kx85/analyze_native.py",
@@ -534,13 +534,13 @@
     },
     {
       "Path": "src/Isafom.Windows/Scripts/SelectiveRemoval.ps1",
-      "Bytes": 27765,
-      "Sha256": "3E34B088A48B298D26D111D4124EA0FA8465384FAB9F62049751FE2A5AEC1852"
+      "Bytes": 31083,
+      "Sha256": "FA0AB630364250B78587421C8CB6091F77C7DACC1977BEB5CC233CE1086EA7F9"
     },
     {
       "Path": "src/Isafom.Windows/SelectiveRemoval.cs",
-      "Bytes": 12968,
-      "Sha256": "64EB517C9A5BC117E327C0EE0B8805AFB525C1C1093D54815C577ADE815C34EE"
+      "Bytes": 13301,
+      "Sha256": "B5720CB0C024A088A5987228D321CAD2BDB13EA4989F7666D24BD26410924AAC"
     },
     {
       "Path": "src/Isafom.Windows/WindowsServices.cs",
@@ -569,8 +569,8 @@
     },
     {
       "Path": "tests/Isafom.Installer.Tests/GuiChecks.cs",
-      "Bytes": 15810,
-      "Sha256": "921733755598D8C3CB4E5CC8DDE55925171F845CF9588262D35F68C652AAB66B"
+      "Bytes": 15926,
+      "Sha256": "35A412D446C40F8E0D0DE88A49F9F0684F5F7CD5743B0FB86EF562254C4D40C9"
     },
     {
       "Path": "tests/Isafom.Installer.Tests/Isafom.Installer.Tests.csproj",
@@ -584,8 +584,8 @@
     },
     {
       "Path": "tests/Isafom.Installer.Tests/SelectiveRemovalChecks.cs",
-      "Bytes": 10658,
-      "Sha256": "F7475C5E95C158C4580F3F4BA4F7625942565A634B998C14D76785FF627944BF"
+      "Bytes": 11523,
+      "Sha256": "93F3D564B3FA171220159C6CC4B5F7410155B70BF633AC413D95E7C80CFEF426"
     },
     {
       "Path": "tests/Isafom.KxReadback.Tests/Isafom.KxReadback.Tests.csproj",
@@ -654,8 +654,8 @@
     },
     {
       "Path": "tests/Test-ForcedRemoval.ps1",
-      "Bytes": 23213,
-      "Sha256": "9BC35B4976EEA0D28CA52B55C88723E2CC78A640A2B2FA60FB8E42A9C0DA8E51"
+      "Bytes": 31096,
+      "Sha256": "7EB901C8BC12FF3F4034068B8E37DFD70A0EC6392DDCE91D403568BAA0254862"
     },
     {
       "Path": "tests/Test-NativeDriverInventory.ps1",
@@ -664,8 +664,8 @@
     },
     {
       "Path": "tests/Test-PublishedApp.ps1",
-      "Bytes": 5617,
-      "Sha256": "3C323A58E0E6E7B41551F8DA9F4C8B558448E5186B8041BEB658F94CB6132C57"
+      "Bytes": 5837,
+      "Sha256": "42305A212288C2454679511EB6BEF9719998E79876C6CEE4C16860F79AC27CF4"
     },
     {
       "Path": "tests/Test-QueueDiscovery.ps1",
@@ -763,14 +763,19 @@
       "Sha256": "82950763AC46C8B1B1A11F3521DA0990E0EE1DD93241C6D34B4B7E7888675C37"
     },
     {
+      "Path": "validation-evidence/selective-related-queues-20261023.json",
+      "Bytes": 2098,
+      "Sha256": "A2571BE1D051C63E89C2E0E074D096188A03E8D5BD0488A7B05CD9865CCAE8B5"
+    },
+    {
       "Path": "validation-evidence/selective-removal-20261023.json",
       "Bytes": 1545,
       "Sha256": "46472AA967336FFB86D677B770F8A997E4F9C85F35DA564131EAC43E73659724"
     },
     {
       "Path": "VALIDATION.md",
-      "Bytes": 7219,
-      "Sha256": "7746C9C136B9CBF6F6E9E532F64A428F28042110358B652DD8E5A4EBB4E4C620"
+      "Bytes": 8764,
+      "Sha256": "97AB4452252A423CAF294F10B86A2401CBBF29EA1309054587C70FD5234AEFF8"
     }
   ]
 }

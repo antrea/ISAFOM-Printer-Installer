@@ -1,5 +1,11 @@
 # Validazione — 0.2.7-rc1
 
+## Selezione per porta, IP, driver o configurazione incompleta — 23 ottobre 2026
+
+Le code di altre marche sono selezionabili quando condividono porta, IP/host o driver con ISAFOM/Kyocera, oppure risultano incomplete. Le altre stampanti sane restano disabilitate. Ogni riga e il riepilogo espongono i motivi; questi non attestano proprietà ISAFOM e non comportano alcuna preselezione. Restano applicate le protezioni di sistema, condivisione, connessione remota, altri utenti e identità. Il piano resta limitato agli ID confermati.
+
+L'[evidenza della revisione](validation-evidence/selective-related-queues-20261023.json) registra 84 controlli Core, 17 Windows/UI/privacy, 78 installer (inclusi 25 selezione/conferma/protocollo), 123 GUI/DPI, 17 identità e 4 catalogo nella build completa con entrambi i payload ufficiali. La suite selettiva finale supera **70 casi** sia con PowerShell 7 sia con Windows PowerShell 5.1. I casi aggiunti coprono altre marche sulla stessa porta o sullo stesso IP, driver condiviso, driver/porta mancanti, registrazioni incomplete, inventari non leggibili, IPv6, porte aggregate, assenza di collegamenti transitivi, motivi vincolati alla conferma e rimozione di una coda correlata anche dopo la Kyocera di riferimento. Un cambio di IP durante il batch blocca la coda interessata; l'endpoint è ricontrollato anche con l'handle nativo aperto. Le prove rimangono simulate per le cancellazioni: nessuna stampante reale è stata rimossa. L'inventario incorporato reale viene verificato senza cambiare il sistema.
+
 ## Rimozione della predefinita e di più Kyocera — 23 ottobre 2026
 
 La rimozione selettiva consente ora di spuntare anche la predefinita e più Kyocera locali con porta errata o mancante. Le code non riconosciute come ISAFOM sono indicate senza attribuire loro una proprietà non verificata. Predefinita e associazione non verificata richiedono conferme dedicate, invalidate insieme al riepilogo quando cambia la selezione. La predefinita viene rimossa per ultima, senza impostarne una sostitutiva. Identità, lavori e dipendenze restano ricontrollati prima delle operazioni.

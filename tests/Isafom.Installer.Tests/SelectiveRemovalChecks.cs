@@ -5,10 +5,10 @@ using Isafom.Windows;
 internal static class SelectiveRemovalChecks
 {
     internal static SelectiveQueue[] Inventory => [
-        new("00000000-0000-0000-0000-000000000001","ISAFOM principale","Kyocera TASKalfa 3554ci KX","IP_1","192.0.2.1","Offline","ISAFOM",true,"",true,new string('A',64)),
-        new("00000000-0000-0000-0000-000000000002","ISAFOM copia","Kyocera TASKalfa 3554ci KX","IP_2","192.0.2.1","Incompleta","ISAFOM — incompleta",true,"",true,new string('B',64)),
+        new("00000000-0000-0000-0000-000000000001","ISAFOM principale","Kyocera TASKalfa 3554ci KX","IP_1","192.0.2.1","Offline","ISAFOM",true,"",true,new string('A',64),Reasons:["Installazione ISAFOM","Stessa porta della Kyocera"]),
+        new("00000000-0000-0000-0000-000000000002","ISAFOM copia","Kyocera TASKalfa 3554ci KX","IP_2","192.0.2.1","Incompleta","ISAFOM — incompleta",true,"",true,new string('B',64),Reasons:["Configurazione incompleta"]),
         new("00000000-0000-0000-0000-000000000003","PDF di sistema","Microsoft Print to PDF","PORTPROMPT:","","Normal","Altra stampante",false,"Stampante di sistema",false,new string('C',64)),
-        new("00000000-0000-0000-0000-000000000004","ISAFOM predefinita","Kyocera TASKalfa 3554ci KX","IP_1","192.0.2.1","Normal","ISAFOM",true,"",true,new string('D',64),true)
+        new("00000000-0000-0000-0000-000000000004","ISAFOM predefinita","Kyocera TASKalfa 3554ci KX","IP_1","192.0.2.1","Normal","ISAFOM",true,"",true,new string('D',64),true,["Driver Kyocera"])
     ];
     internal static SelectiveRemovalPlan Plan(string[] ids) => new(Inventory.Where(q=>ids.Contains(q.QueueId)).ToArray(),
         [new("IP_2","192.0.2.1",1,9100)],[],[],["Driver condiviso: Kyocera TASKalfa 3554ci KX"],new string('E',64));
@@ -48,22 +48,25 @@ internal static class SelectiveRemovalChecks
         dialog.RefreshAsync().GetAwaiter().GetResult();
         check(loads==1&&dialog.QueueChoices.All(c=>c.IsChecked==false)&&dialog.ApprovedPlan is null,"Refresh reads a new inventory without restarting and clears all selections");
         dialog.Close();
-        var other=Inventory[3] with { Associated=false, Association="Altra Kyocera — associazione ISAFOM non verificata", PortName="Porta errata" };
-        SelectiveQueue[] mixed=[Inventory[0],other,Inventory[2]];
+        var other=Inventory[3] with { Name="HP installata per errore", DriverName="HP", Associated=false, Association="Altra stampante — associazione ISAFOM non verificata", PortName="IP_1", Reasons=["Stessa porta della Kyocera"] };
+        var unrelated=Inventory[2] with { QueueId="00000000-0000-0000-0000-000000000005", Name="Epson ufficio",DriverName="Epson",PortName="IP_5",Protection="Nessun collegamento con la Kyocera e nessuna configurazione incompleta" };
+        SelectiveQueue[] mixed=[Inventory[0],other,Inventory[2],unrelated];
         var batch=new SelectiveRemovalWindow(()=>Task.FromResult(mixed),ids=>Task.FromResult(new SelectiveRemovalPlan(mixed.Where(q=>ids.Contains(q.QueueId)).ToArray(),[],[],[],[],new string('F',64))));
         batch.SetInventory(mixed);
-        check(batch.QueueChoices.Count==2&&batch.QueueChoices.All(c=>c.IsEnabled&&c.IsChecked==false),"Unassociated local Kyocera queues are visible and selectable alongside ISAFOM queues, with no preselection");
+        check(batch.QueueChoices.Count==2&&batch.QueueChoices.All(c=>c.IsEnabled&&c.IsChecked==false),"A related queue of another brand is visible and selectable alongside ISAFOM, with no preselection");
+        check(((TextBlock)batch.QueueChoices[1].Content).Text.Contains(other.SelectionReasons),"A related queue explains why it is selectable in its inventory row");
         foreach(var choice in batch.QueueChoices)choice.IsChecked=true;
         batch.ReviewAsync().GetAwaiter().GetResult();
-        check(batch.ApprovedPlan?.Queues.Length==2&&batch.ApprovedPlan.RemovesOtherKyocera&&batch.ApprovedPlan.RemovesDefaultPrinter&&batch.ApprovedPlan.Description.Contains(other.Association)&&batch.OtherKyoceraAcknowledgement.Visibility==Visibility.Visible,"One reviewed batch binds multiple exact queue identities and flags uncertain association and default status");
+        check(batch.ApprovedPlan?.Queues.Length==2&&batch.ApprovedPlan.RemovesUnverifiedQueues&&batch.ApprovedPlan.RemovesDefaultPrinter&&batch.ApprovedPlan.Description.Contains(other.Association)&&batch.ApprovedPlan.Description.Contains(other.SelectionReasons)&&batch.UnverifiedQueuesAcknowledgement.Visibility==Visibility.Visible,"One reviewed batch binds exact identities, eligibility reasons, uncertain association and default status");
         batch.Acknowledgement.IsChecked=true;batch.DefaultAcknowledgement.IsChecked=true;
         check(!batch.RemoveButton.IsEnabled,"Unassociated Kyocera batch also requires dedicated association confirmation");
-        batch.OtherKyoceraAcknowledgement.IsChecked=true;
+        batch.UnverifiedQueuesAcknowledgement.IsChecked=true;
         check(batch.RemoveButton.IsEnabled,"All required confirmations enable the exact multi-printer batch");
         batch.DefaultAcknowledgement.IsChecked=false;
         check(!batch.RemoveButton.IsEnabled,"Association confirmation cannot bypass default confirmation");
         batch.ShowOthers.IsChecked=true;
-        check(batch.ApprovedPlan is null&&batch.OtherKyoceraAcknowledgement.IsChecked==false&&batch.DefaultAcknowledgement.IsChecked==false&&batch.QueueChoices.All(c=>c.IsChecked==false),"Changing inventory visibility invalidates all batch confirmations and selections");
+        check(batch.ApprovedPlan is null&&batch.UnverifiedQueuesAcknowledgement.IsChecked==false&&batch.DefaultAcknowledgement.IsChecked==false&&batch.QueueChoices.All(c=>c.IsChecked==false),"Changing inventory visibility invalidates all batch confirmations and selections");
+        check(batch.QueueChoices.Count==4&&batch.QueueChoices.Take(2).All(c=>c.IsEnabled)&&batch.QueueChoices.Skip(2).All(c=>!c.IsEnabled),"Showing all printers keeps both system and healthy unrelated queues grey and unselectable");
         batch.Close();
         var failing=new SelectiveRemovalWindow(()=>Task.FromException<SelectiveQueue[]>(new UnauthorizedAccessException()),ids=>Task.FromResult(Plan(ids)));
         failing.SetInventory(Inventory);failing.QueueChoices[0].IsChecked=true;
@@ -95,7 +98,7 @@ internal static class SelectiveRemovalChecks
             var rows=SelectiveRemovalService.InventoryAsync(Isafom.Core.PrinterSettings.Default()).GetAwaiter().GetResult();
             var after=new WindowsMachine(Isafom.Core.PrinterSettings.Default()).InspectAsync(CancellationToken.None).GetAwaiter().GetResult();
             if(rows.Length<before.Queues.Length || System.Text.Json.JsonSerializer.Serialize(before)!=System.Text.Json.JsonSerializer.Serialize(after))throw new Exception("Read-only inventory changed system metadata");
-            if(rows.Any(q=>q.CanSelect&&((!q.Associated&&!System.Text.RegularExpressions.Regex.IsMatch(q.DriverName,@"^Kyocera(?:\s|$)",System.Text.RegularExpressions.RegexOptions.IgnoreCase))||!Guid.TryParse(q.QueueId,out _))))throw new Exception("Unsafe inventory row");
+            if(rows.Any(q=>q.CanSelect&&(q.Reasons is not {Length:>0}||q.Protection.Length>0||!Guid.TryParse(q.QueueId,out _))))throw new Exception("Selectable inventory row has no verified identity or eligibility reason");
             if(rows.Any(q=>q.IsDefault!=storedDefaultBefore.StartsWith(q.Name+",",StringComparison.OrdinalIgnoreCase)))throw new Exception("Original-user default printer status missing from inventory");
             if(defaultBefore!=Isafom.KxSentinel.PrinterStore.DefaultName())throw new Exception("Default printer changed during read-only inventory");
             if(storedDefaultBefore!=(Microsoft.Win32.Registry.GetValue(defaultKey,"Device","") as string??""))throw new Exception("Original-user default printer changed during read-only inventory");

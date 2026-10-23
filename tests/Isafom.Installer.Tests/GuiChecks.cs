@@ -139,7 +139,7 @@ internal static class GuiChecks
             using(var confirmationFile=File.Create(Path.Combine(output,"Disinstallazione_Anteprima_025.png")))confirmationPng.Save(confirmationFile);
             confirmation.Close();
             var forceInventory=SelectiveRemovalChecks.Inventory;
-            forceInventory[1]=forceInventory[1] with { Associated=false, Association="Altra Kyocera — associazione ISAFOM non verificata", PortName="Porta errata" };
+            forceInventory[1]=forceInventory[1] with { Name="HP installata per errore",DriverName="HP",Associated=false, Association="Altra stampante — associazione ISAFOM non verificata", PortName="IP_1",Reasons=["Stessa porta della Kyocera","Stesso IP/host della Kyocera"] };
             var forceConfirmation=new SelectiveRemovalWindow(()=>Task.FromResult(forceInventory),
                 ids=>Task.FromResult(new SelectiveRemovalPlan(forceInventory.Where(q=>ids.Contains(q.QueueId)).ToArray(),[],[],[],[],new string('F',64))));
             forceConfirmation.SetInventory(forceInventory);
@@ -156,7 +156,7 @@ internal static class GuiChecks
             forceConfirmation.ReviewAsync().GetAwaiter().GetResult();
             forceRoot.Measure(new(660,620));forceRoot.Arrange(new Rect(0,0,660,620));forceRoot.UpdateLayout();
             ((DockPanel)forceRoot).Children.OfType<ScrollViewer>().Single().ScrollToBottom();Pump();forceRoot.UpdateLayout();
-            Check(Unclipped(forceConfirmation.Acknowledgement,forceRoot)&&Unclipped(forceConfirmation.DefaultAcknowledgement,forceRoot)&&Unclipped(forceConfirmation.OtherKyoceraAcknowledgement,forceRoot)&&Unclipped(forceConfirmation.RemoveButton,forceRoot)&&!forceConfirmation.RemoveButton.IsEnabled,"Multiple queue review keeps all dedicated confirmations reachable by scrolling and actions visible");
+            Check(Unclipped(forceConfirmation.Acknowledgement,forceRoot)&&Unclipped(forceConfirmation.DefaultAcknowledgement,forceRoot)&&Unclipped(forceConfirmation.UnverifiedQueuesAcknowledgement,forceRoot)&&Unclipped(forceConfirmation.RemoveButton,forceRoot)&&!forceConfirmation.RemoveButton.IsEnabled,"Multiple queue review keeps all dedicated confirmations reachable by scrolling and actions visible");
             var batchBitmap=new RenderTargetBitmap(660,620,96,96,PixelFormats.Pbgra32);batchBitmap.Render(forceRoot);
             var batchPng=new PngBitmapEncoder();batchPng.Frames.Add(BitmapFrame.Create(batchBitmap));
             using(var batchFile=File.Create(Path.Combine(output,"Disinstallazione_SelezioneMultipla_027.png")))batchPng.Save(batchFile);

@@ -23,11 +23,25 @@ function Get-IsafomSelectiveHash($Value) {
     finally {$sha.Dispose()}
 }
 
+function Get-IsafomSelectiveEndpoint([string]$Value) {
+    $ip=$null
+    if([Net.IPAddress]::TryParse($Value,[ref]$ip)){return $ip.ToString().ToLowerInvariant()}
+    $Value.Trim().TrimEnd('.').ToLowerInvariant()
+}
+
+function Get-IsafomSelectiveDriverNames {
+    Get-PrinterDriver -ErrorAction Stop|ForEach-Object Name
+}
+
 function Get-IsafomSelectiveInventory($s,[string]$OwnerSid) {
     if((Get-Service Spooler -ErrorAction Stop).Status -ne 'Running'){throw 'SpoolerUnavailable'}
     $queues=@(Get-Printer -ErrorAction Stop)
     $registry=@(Get-IsafomQueueRegistry)
     $ports=@(Get-CimInstance Win32_TCPIPPrinterPort -ErrorAction Stop)
+    $portInventoryKnown=$true;$installedPorts=@()
+    try {$installedPorts=@(Get-PrinterPort -ErrorAction Stop|ForEach-Object Name)} catch {$portInventoryKnown=$false}
+    $driverInventoryKnown=$true;$installedDrivers=@()
+    try {$installedDrivers=@(Get-IsafomSelectiveDriverNames)} catch {$driverInventoryKnown=$false}
     $marker=Get-IsafomOwnerMarker $OwnerSid
     # Include damaged registrations absent from the PrintManagement provider.
     $names=@(@($queues|ForEach-Object Name)+@($registry|ForEach-Object Name)|Sort-Object -Unique)
@@ -44,31 +58,45 @@ function Get-IsafomSelectiveInventory($s,[string]$OwnerSid) {
             $driver=$r[0].DriverName;$port=$r[0].PortName;$comment=$r[0].Comment
             $local=($r[0].Attributes -band 64) -ne 0;$shared=($r[0].Attributes -band 8) -ne 0
         }
-        $tcp=@($ports|Where-Object Name -CEQ $port)
+        $portNames=@($port -split ','|ForEach-Object {$_.Trim()}|Where-Object {$_})
+        $tcp=@($ports|Where-Object {$_.Name -iin $portNames}|Sort-Object Name)
         $address=(@($tcp|ForEach-Object HostAddress) -join ', ')
         $owned=Test-IsafomManagedQueue $name $comment $marker
         $target=$tcp.Count -eq 1 -and (Test-IsafomTarget $s $tcp[0].HostAddress)
         $associated=$owned -or ($driver -ceq $s.DriverName -and $target)
-        # A wrong/missing port must not make a local Kyocera queue impossible
-        # to select. Keep uncertain association visible; do not claim ownership.
         $kyocera=$driver -match '^Kyocera(?:\s|$)'
-        $association=if($owned){'ISAFOM'}elseif($associated){'ISAFOM: duplicata/manuale o incompleta'}elseif($kyocera){'Altra Kyocera — associazione ISAFOM non verificata'}else{'Altra stampante'}
-        if($comment -ceq ($marker+' pending') -or $q.Count -eq 0){$association+=' — incompleta'}
+        $association=if($owned){'ISAFOM'}elseif($associated){'ISAFOM: duplicata/manuale o incompleta'}elseif($kyocera){'Altra Kyocera — associazione ISAFOM non verificata'}else{'Altra stampante — associazione ISAFOM non verificata'}
+        $incomplete=$q.Count -eq 0 -or -not $driver.Trim() -or $portNames.Count -eq 0 -or $comment -ceq ($marker+' pending') -or
+            ($driverInventoryKnown -and $driver -notin $installedDrivers) -or
+            ($portInventoryKnown -and @($portNames|Where-Object {$_ -notin $installedPorts}).Count -gt 0)
         $default=Test-IsafomOriginalDefault $OwnerSid $name
         $protection=''
-        if((-not $associated -and -not $kyocera) -or $driver -match '^(Microsoft |Remote Desktop |OneNote|Fax\b)' -or $port -match '^(TS[0-9]+|PORTPROMPT:|nul:)$'){$protection='Stampante non pertinente o di sistema'}
+        if($driver -match '^(Microsoft |Remote Desktop |OneNote|Fax\b)' -or @($portNames|Where-Object {$_ -match '^(TS[0-9]+|PORTPROMPT:|nul:)$'}).Count){$protection='Stampante di sistema'}
         elseif(-not $local){$protection='Connessione remota protetta'}
         elseif($shared){$protection='Coda condivisa con altri utenti'}
         elseif(($comment -match '^CNR-ISAFOM Printer Installer' -or $comment -ceq 'Autore: Andrea Esposito - andrea.esposito@cnr.it') -and -not $owned){$protection='Installazione di un altro utente o proprietà non verificata'}
         elseif(-not $id -or $q.Count -gt 1 -or $r.Count -ne 1){$protection='Identità Windows non univoca o non disponibile'}
         elseif($q.Count -eq 1 -and ($r[0].DriverName -cne $driver -or $r[0].PortName -cne $port)){$protection='Inventario incoerente: aggiornare'}
-        $signature=Get-IsafomSelectiveHash @($id,$name,$driver,$port,$comment,$local,$shared,$default)
+        $signature=Get-IsafomSelectiveHash @($id,$name,$driver,$port,$address,$comment,$local,$shared,$default)
         [pscustomobject]@{QueueId=$id;Name=$name;DriverName=$driver;PortName=$port;Address=$address;Status=$status;
-            Association=$association;Associated=$associated;Protection=$protection;CanSelect=($protection.Length -eq 0);
+            Association=$association;Associated=$associated;Protection=$protection;CanSelect=$false;
+            Reasons=@(if($associated){'Installazione ISAFOM'};if($kyocera){'Driver Kyocera'};if($incomplete){'Configurazione incompleta'});
             Signature=$signature;IsDefault=$default;Object=$object;IdentityComment=$comment}
     })
+    # Relationships come only from original ISAFOM/Kyocera registrations and
+    # configured installer endpoints. Never traverse newly related queues.
+    $references=@($rows|Where-Object {$_.Associated -or $_.DriverName -match '^Kyocera(?:\s|$)'})
+    $referencePorts=@(@($s.PortName)+@($references|ForEach-Object {$_.PortName -split ','|ForEach-Object {$_.Trim()}|Where-Object {$_}})|Sort-Object -Unique)
+    $referenceDrivers=@(@($s.DriverName)+@($references|ForEach-Object DriverName|Where-Object {$_})|Sort-Object -Unique)
+    $referenceEndpoints=@(@($s.Host,$s.FallbackIPv4)+@($ports|Where-Object {$_.Name -iin $referencePorts}|ForEach-Object HostAddress)|Where-Object {$_}|ForEach-Object {Get-IsafomSelectiveEndpoint $_}|Sort-Object -Unique)
     foreach($row in $rows) {
+        $portNames=@($row.PortName -split ','|ForEach-Object {$_.Trim()}|Where-Object {$_})
+        if(@($portNames|Where-Object {$_ -iin $referencePorts}).Count){$row.Reasons+=@('Stessa porta della Kyocera')}
+        if(@($ports|Where-Object {$_.Name -iin $portNames}|Where-Object {(Get-IsafomSelectiveEndpoint $_.HostAddress) -cin $referenceEndpoints}).Count){$row.Reasons+=@('Stesso IP/host della Kyocera')}
+        if($row.DriverName -and $row.DriverName -iin $referenceDrivers){$row.Reasons+=@('Driver condiviso con la Kyocera')}
+        if(-not $row.Protection -and $row.Reasons.Count -eq 0){$row.Protection='Nessun collegamento con la Kyocera e nessuna configurazione incompleta'}
         if($row.QueueId -and @($rows|Where-Object QueueId -CEQ $row.QueueId).Count -ne 1){$row.CanSelect=$false;$row.Protection='GUID Windows duplicato'}
+        $row.CanSelect=$row.Protection.Length -eq 0
     }
     $rows
 }
@@ -162,7 +190,7 @@ function Get-IsafomSelectivePlan($s,[string]$OwnerSid,[string[]]$QueueIds) {
     })
     try {$resources=Get-IsafomSelectiveResources $s $rows $selected}
     catch {$resources=[pscustomobject]@{Ports=@();Drivers=@();Packages=@();Files=@();Retained=@();Unresolved=@('Risorse conservate: inventario delle dipendenze non verificabile')}}
-    $facts=[ordered]@{Queues=@($selected|Sort-Object QueueId|Select-Object QueueId,Name,DriverName,PortName,Address,Signature,Status,Association,Associated,Protection,CanSelect,IsDefault);
+    $facts=[ordered]@{Queues=@($selected|Sort-Object QueueId|Select-Object QueueId,Name,DriverName,PortName,Address,Signature,Status,Association,Associated,Protection,CanSelect,IsDefault,Reasons);
         Ports=$resources.Ports;Drivers=$resources.Drivers;Packages=$resources.Packages;Files=$resources.Files;Retained=$resources.Retained;Unresolved=$resources.Unresolved}
     [pscustomobject]@{Queues=$facts.Queues;Ports=$facts.Ports;Drivers=$facts.Drivers;Packages=$facts.Packages;
         Files=$facts.Files;Retained=$facts.Retained;Unresolved=$facts.Unresolved;Fingerprint=(Get-IsafomSelectiveHash $facts)}
@@ -178,6 +206,20 @@ function Assert-IsafomSelectiveDefault($Row,[string]$OwnerSid) {
     # A default queue is removable only when that status was part of the
     # reviewed fingerprint. A later default change requires a new review.
     if([bool](Test-IsafomOriginalDefault $OwnerSid $Row.Name) -ne [bool]$Row.IsDefault){throw 'RemovalChanged'}
+}
+
+function Test-IsafomSelectiveApprovedRow($Row,$Approved) {
+    # A selected reference queue may already have been removed in this batch.
+    # Its loss cannot revoke consent for another unchanged selected instance.
+    # All other identity, ownership, system and sharing protections still apply.
+    $Approved.CanSelect -and $Row.Signature -ceq $Approved.Signature -and
+        ($Row.CanSelect -or $Row.Protection -ceq 'Nessun collegamento con la Kyocera e nessuna configurazione incompleta')
+}
+
+function Assert-IsafomSelectiveEndpoint($Row) {
+    $portNames=@($Row.PortName -split ','|ForEach-Object {$_.Trim()}|Where-Object {$_})
+    $address=(@(Get-CimInstance Win32_TCPIPPrinterPort -ErrorAction Stop|Where-Object {$_.Name -iin $portNames}|Sort-Object Name|ForEach-Object HostAddress) -join ', ')
+    if($address -cne $Row.Address){throw 'RemovalChanged'}
 }
 
 function Remove-IsafomSelectiveQueueNative($Row,[string]$OwnerSid) {
@@ -222,6 +264,7 @@ public static class IsafomSelectiveNative {
         $r=@(Get-IsafomQueueRegistry|Where-Object Name -CEQ $Row.Name)
         if($r.Count -ne 1 -or ([guid]$r[0].QueueId).ToString('D') -cne $Row.QueueId -or $r[0].DriverName -cne $Row.DriverName -or $r[0].PortName -cne $Row.PortName -or $r[0].Comment -cne $Row.IdentityComment){throw 'RemovalChanged'}
         Assert-IsafomSelectiveDefault $Row $OwnerSid
+        Assert-IsafomSelectiveEndpoint $Row
         if(-not [IsafomSelectiveNative]::EmptyAndMatching($handle,$Row.Name,$Row.DriverName,$Row.PortName,$Row.IdentityComment)){throw 'RemovalBlocked'}
         if(-not [IsafomSelectiveNative]::DeletePrinter($handle)){throw 'RemovalBlocked'}
     } finally {$null=[IsafomSelectiveNative]::ClosePrinter($handle)}
@@ -245,7 +288,7 @@ function Invoke-IsafomSelectiveRemoval($s,[string]$OwnerSid,[string[]]$QueueIds,
             $rows=@(Get-IsafomSelectiveInventory $s $OwnerSid)
             $matches=@($rows|Where-Object QueueId -CEQ $approved.QueueId)
             if($matches.Count -eq 0){$removed=Test-IsafomSelectiveAbsent $rows $approved}
-            elseif($matches.Count -ne 1 -or -not $matches[0].CanSelect -or $matches[0].Signature -cne $approved.Signature){$details='Identità o protezioni cambiate: aggiornare l''elenco'}
+            elseif($matches.Count -ne 1 -or -not (Test-IsafomSelectiveApprovedRow $matches[0] $approved)){$details='Identità o protezioni cambiate: aggiornare l''elenco'}
             else {
                 $row=$matches[0]
                 $jobs=@();if($null -ne $row.Object){$jobs=@(Get-PrintJob -PrinterName $row.Name -ErrorAction Stop)}
@@ -254,7 +297,7 @@ function Invoke-IsafomSelectiveRemoval($s,[string]$OwnerSid,[string[]]$QueueIds,
                     try {Remove-IsafomSelectiveQueue $row $OwnerSid} catch {$details='Comando di rimozione non riuscito'}
                     $after=@(Get-IsafomSelectiveInventory $s $OwnerSid)
                     $present=@($after|Where-Object QueueId -CEQ $approved.QueueId)
-                    if($present.Count -eq 1 -and $present[0].CanSelect -and $present[0].Signature -ceq $approved.Signature) {
+                    if($present.Count -eq 1 -and (Test-IsafomSelectiveApprovedRow $present[0] $approved)) {
                         # Bounded retry, same queue only. Never cancel jobs.
                         if($null -eq $present[0].Object -or @(Get-PrintJob -PrinterName $row.Name -ErrorAction Stop).Count -eq 0) {
                             try {Remove-IsafomSelectiveQueueNative $present[0] $OwnerSid} catch {$details='Recupero mirato non riuscito: verificare permessi o coda danneggiata'}
